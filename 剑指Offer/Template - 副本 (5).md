@@ -1,8 +1,0 @@
-### Description
-
-### Thinking
-
-### Solution
-```java
-
-```
