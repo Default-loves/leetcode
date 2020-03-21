@@ -29,6 +29,8 @@
 
 ### Thinking
 
+用一个boolean变量记录顺序的方向，每一次循环的时候就取反
+
 ### Solution
 ```java
 /**
