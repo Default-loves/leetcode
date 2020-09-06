@@ -2,10 +2,6 @@
 
 
 
-### Thinking
-
-
-
 ### Solution
 ```java
 
