@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/accessing-data-with-mysql/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/accessing-data-with-mysql/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/building-a-RESTful-web-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/comsuming-RESTful-web-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/comsuming-restful-web-service-jquery/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enabling-cross-origin-requests-for-restful-web-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/handling-form-submission/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/serving-web-content-with-spring-mvc/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/validating-form-input/src/main/java" charset="UTF-8" />
+  </component>
+</project>

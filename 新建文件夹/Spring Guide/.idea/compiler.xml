@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="enabling-cross-origin-requests-for-restful-web-service" />
+        <module name="validating-form-input" />
+        <module name="comsuming-RESTful-web-service" />
+        <module name="accessing-data-with-mysql" />
+        <module name="comsuming-restful-web-service-jquery" />
+        <module name="building-a-rESTful-web-service" />
+        <module name="serving-web-content-with-spring-mvc" />
+        <module name="handling-form-submission" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="accessing-data-with-mysql" target="1.8" />
+      <module name="building-a-rESTful-web-service" target="1.8" />
+      <module name="comsuming-RESTful-web-service" target="1.8" />
+      <module name="comsuming-restful-web-service-jquery" target="1.8" />
+      <module name="enabling-cross-origin-requests-for-restful-web-service" target="1.8" />
+      <module name="handling-form-submission" target="1.8" />
+      <module name="serving-web-content-with-spring-mvc" target="1.8" />
+      <module name="Spring Guide" target="1.8" />
+      <module name="validating-form-input" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Spring Guide" options="-parameters" />
+      <module name="accessing-data-with-mysql" options="-parameters" />
+      <module name="building-a-rESTful-web-service" options="-parameters" />
+      <module name="comsuming-RESTful-web-service" options="-parameters" />
+      <module name="comsuming-restful-web-service-jquery" options="-parameters" />
+      <module name="enabling-cross-origin-requests-for-restful-web-service" options="-parameters" />
+      <module name="handling-form-submission" options="-parameters" />
+      <module name="serving-web-content-with-spring-mvc" options="-parameters" />
+      <module name="validating-form-input" options="-parameters" />
+    </option>
+  </component>
+</project>

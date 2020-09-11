@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Spring Guide.iml" filepath="$PROJECT_DIR$/.idea/Spring Guide.iml" group="Spring Guide and modules" />
+      <module fileurl="file://$PROJECT_DIR$/accessing-data-with-mysql/accessing-data-with-mysql.iml" filepath="$PROJECT_DIR$/accessing-data-with-mysql/accessing-data-with-mysql.iml" />
+      <module fileurl="file://$PROJECT_DIR$/building-a-RESTful-web-service/building-a-rESTful-web-service.iml" filepath="$PROJECT_DIR$/building-a-RESTful-web-service/building-a-rESTful-web-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/comsuming-RESTful-web-service/comsuming-RESTful-web-service.iml" filepath="$PROJECT_DIR$/comsuming-RESTful-web-service/comsuming-RESTful-web-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/comsuming-restful-web-service-jquery/comsuming-restful-web-service-jquery.iml" filepath="$PROJECT_DIR$/comsuming-restful-web-service-jquery/comsuming-restful-web-service-jquery.iml" group="Spring Guide and modules" />
+      <module fileurl="file://$PROJECT_DIR$/enabling-cross-origin-requests-for-restful-web-service/enabling-cross-origin-requests-for-restful-web-service.iml" filepath="$PROJECT_DIR$/enabling-cross-origin-requests-for-restful-web-service/enabling-cross-origin-requests-for-restful-web-service.iml" group="Spring Guide and modules" />
+      <module fileurl="file://$PROJECT_DIR$/handling-form-submission/handling-form-submission.iml" filepath="$PROJECT_DIR$/handling-form-submission/handling-form-submission.iml" group="Spring Guide and modules" />
+      <module fileurl="file://$PROJECT_DIR$/serving-web-content-with-spring-mvc/serving-web-content-with-spring-mvc.iml" filepath="$PROJECT_DIR$/serving-web-content-with-spring-mvc/serving-web-content-with-spring-mvc.iml" group="Spring Guide and modules" />
+      <module fileurl="file://$PROJECT_DIR$/validating-form-input/validating-form-input.iml" filepath="$PROJECT_DIR$/validating-form-input/validating-form-input.iml" group="Spring Guide and modules" />
+    </modules>
+  </component>
+</project>
