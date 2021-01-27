@@ -15,50 +15,32 @@ import static java.lang.Math.min;
 
 public class LeetCodeSolution {
 
-    public List<Integer> splitIntoFibonacci(String S) {
-        ArrayList<Integer> res = new ArrayList<>();
-        doSplit(res, S, 0, S.length(), 0, 0);
-        return res;
+    public int findMaxForm(String[] strs, int m, int n) {
+        int[][] dp = new int[m+1][n+1];
+        for (String str : strs) {
+            int[] result = cal(str);
+            int zeroCount = result[0];
+            int oneCount = result[1];
+            for (int j = m; j >= zeroCount; j--) {
+                for (int k = n; k >= oneCount; k--) {
+                    dp[j][k] = Math.max(dp[j][k], dp[j-zeroCount][k-oneCount] + 1);
+                }
+            }
+        }
+        return dp[m][n];
     }
 
     /**
-     *
-     * @param res：最后的结果
-     * @param source：源字符串, 不会改变
-     * @param index：当前的字符串索引
-     * @param length：源字符串的长度
-     * @param sum：切分结果最后两个元素的和
-     * @param prev：切分结果最后一个元素的值
+     * 计算字符串的0和1数量
+     * @param str
+     * @return 数组索引0对应0的数量，索引1对应1的数量
      */
-    private boolean doSplit(ArrayList<Integer> res, String source, int index, int length, int sum, int prev) {
-        if (index == length) {
-            return res.size() >= 3;
+    private int[] cal(String str) {
+        int[] result = new int[2];
+        for (char c : str.toCharArray()) {
+            result[c-'0']++;
         }
-        long cnt = 0;
-        for (int i = index; i < length; i++) {
-             if (index < i && source.charAt(index) == '0') {   // 对于开头是“0”的子串，不再处理
-                 break;
-             }
-             cnt = cnt * 10 + (source.charAt(i) - '0');
-             if (cnt > Integer.MAX_VALUE) {     // 每个子串的大小不大于2^31 - 1
-                 break;
-             }
-             int cur = (int) cnt;
-             if (res.size() >= 2) {
-                 if (cur < sum) {
-                     continue;
-                 } else if (cur > sum) {    // 累加的值已经大于切分结果最后两个元素的和，后续不再处理
-                     break;
-                 }
-             }
-             res.add(cur);      // 添加进 res 的数符合 cur == sum
-             if (doSplit(res, source, i+1, length, prev + cur, cur)) {
-                 return true;
-             } else {
-                 res.remove(res.size()-1);
-             }
-        }
-        return false;
+        return result;
     }
 
 
@@ -66,7 +48,7 @@ public class LeetCodeSolution {
         LeetCodeSolution lcs = new LeetCodeSolution();
         String[] arr = new String[]{"What","must","be","acknowledgment","shall","be"};
         List<Integer> res = lcs.splitIntoFibonacci("123456579");
-        System.out.println(res);
+        System.out.println(res);·
     }
 }
 
