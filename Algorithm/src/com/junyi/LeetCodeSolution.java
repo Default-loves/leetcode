@@ -15,32 +15,22 @@ import static java.lang.Math.min;
 
 public class LeetCodeSolution {
 
-    public int findMaxForm(String[] strs, int m, int n) {
-        int[][] dp = new int[m+1][n+1];
-        for (String str : strs) {
-            int[] result = cal(str);
-            int zeroCount = result[0];
-            int oneCount = result[1];
-            for (int j = m; j >= zeroCount; j--) {
-                for (int k = n; k >= oneCount; k--) {
-                    dp[j][k] = Math.max(dp[j][k], dp[j-zeroCount][k-oneCount] + 1);
-                }
+    public int findTargetSumWays(int[] nums, int S) {
+        int sum = Arrays.stream(nums).sum();
+        if (Math.abs(S) > Math.abs(sum)) {
+            return 0;
+        }
+        int t = sum*2+1;    // dp的列数，包括了负数、0、正数
+        int[][] dp = new int[nums.length+1][t];
+        dp[0][sum] = 1;     // 初始化
+        for (int i = 1; i <= nums.length; i++) {
+            for (int j = 0; j < t; j++) {
+                int part1 = j - sum - nums[i-1] >= 0? dp[i-1][j-sum-nums[i-1]]: 0;
+                int part2 = j - sum + nums[i-1] >= 0? dp[i-1][j-sum+nums[i-1]]: 0;
+                dp[i][j] = part1 + part2;
             }
         }
-        return dp[m][n];
-    }
-
-    /**
-     * 计算字符串的0和1数量
-     * @param str
-     * @return 数组索引0对应0的数量，索引1对应1的数量
-     */
-    private int[] cal(String str) {
-        int[] result = new int[2];
-        for (char c : str.toCharArray()) {
-            result[c-'0']++;
-        }
-        return result;
+        return dp[nums.length][S];
     }
 
 
@@ -48,7 +38,7 @@ public class LeetCodeSolution {
         LeetCodeSolution lcs = new LeetCodeSolution();
         String[] arr = new String[]{"What","must","be","acknowledgment","shall","be"};
         List<Integer> res = lcs.splitIntoFibonacci("123456579");
-        System.out.println(res);·
+        System.out.println(res);
     }
 }
 
