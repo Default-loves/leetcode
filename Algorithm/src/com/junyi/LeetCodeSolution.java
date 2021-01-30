@@ -16,30 +16,46 @@ import static java.lang.Math.min;
 
 public class LeetCodeSolution {
 
-    public int profitableSchemes(int n, int minProfit, int[] group, int[] profit) {
-        int N = group.length;
-        int THRESHOLD = 1_000_000_007;
-        int[][] dp = new int[n+1][minProfit+1];
-        for (int i = 0; i <= n; i++) {
-            dp[i][0] = 1;
+    private static final Integer row = 9;
+
+
+    public String largestNumber(int[] cost, int target) {
+        String[][] dp = new String[row][target+1];
+        for (int i = 0; i <= target; i++) {
+            dp[0][i] = i % cost[0] == 0? "1": "";
         }
-        for (int i = 0; i < N; i++) {
-            for (int j = n; j >= group[i]; j--) {
-                for (int k = minProfit; k >= 0; k--) {
-                    int t = Math.max(k - profit[i], 0);
-                    dp[j][k] += dp[j-group[i]][t];
-                    dp[j][k] %= THRESHOLD;
+        dp[0][0] = " ";
+        for (int i = 1; i < row; i++) {
+            for (int j = 0; j <= target; j++) {
+                dp[i][j] = dp[i-1][j];
+                if (j >= cost[i] && "".compareTo(dp[i][j - cost[i]]) != 0) {
+                    dp[i][j] = max(dp[i-1][j], i + 1 + dp[i-1][j-cost[i]]);
                 }
             }
+
         }
-        return dp[n][minProfit];
+        for (int i = 0; i < dp.length; i++) {
+            System.out.println(Arrays.toString(dp[i]));
+        }
+        String res = dp[row - 1][target];
+        if ("".equals(res)) {
+            return "0";
+        }
+        return res.substring(0, res.length()-1);
+    }
+
+    private String max(String a, String b) {
+        if (a.length() > b.length()) {
+            return a;
+        } else if (a.length() < b.length()) {
+            return b;
+        }
+        return a.compareTo(b) > 0? a: b;
     }
 
     public static void main(String[] argv) {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        int[] array = new int[]{1, 1, 1, 1, 1};
-        Integer res = lcs.findTargetSumWays(array, 3);
-        System.out.println(res);
+        System.out.println(1+2+"34");
     }
 }
 
