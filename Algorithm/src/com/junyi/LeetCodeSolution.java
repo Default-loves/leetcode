@@ -21,15 +21,24 @@ public class LeetCodeSolution {
 
     public String largestNumber(int[] cost, int target) {
         String[][] dp = new String[row][target+1];
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i <= target; i++) {
-            dp[0][i] = i % cost[0] == 0? "1": "";
+            if (i % cost[0] == 0) {
+                sb.append("1");
+                dp[0][i] = sb.toString();
+            } else {
+                dp[0][i] = "";
+            }
         }
-        dp[0][0] = " ";
+        dp[0][0] = "";
         for (int i = 1; i < row; i++) {
             for (int j = 0; j <= target; j++) {
                 dp[i][j] = dp[i-1][j];
-                if (j >= cost[i] && "".compareTo(dp[i][j - cost[i]]) != 0) {
-                    dp[i][j] = max(dp[i-1][j], i + 1 + dp[i-1][j-cost[i]]);
+                if (j == cost[i]) {
+                    dp[i][j] = i+1+"";
+                }
+                if (j > cost[i] && "".compareTo(dp[i][j - cost[i]]) != 0) {
+                    dp[i][j] = max(dp[i-1][j], i + 1 + dp[i][j-cost[i]]);
                 }
             }
 
@@ -38,12 +47,12 @@ public class LeetCodeSolution {
             System.out.println(Arrays.toString(dp[i]));
         }
         String res = dp[row - 1][target];
-        if ("".equals(res)) {
-            return "0";
-        }
-        return res.substring(0, res.length()-1);
+        return "".equals(res)? "0": res;
     }
 
+    /**
+     * 计算两个字符串，数字最大的字符串
+     */
     private String max(String a, String b) {
         if (a.length() > b.length()) {
             return a;
