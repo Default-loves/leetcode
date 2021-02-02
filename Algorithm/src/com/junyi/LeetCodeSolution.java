@@ -16,54 +16,33 @@ import static java.lang.Math.min;
 
 public class LeetCodeSolution {
 
-    private static final Integer row = 9;
-
-
-    public String largestNumber(int[] cost, int target) {
-        String[][] dp = new String[row][target+1];
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i <= target; i++) {
-            if (i % cost[0] == 0) {
-                sb.append("1");
-                dp[0][i] = sb.toString();
-            } else {
-                dp[0][i] = "";
+    public int shortestSubarray(int[] A, int K) {
+        int result = Integer.MAX_VALUE;
+        for (int i = 1; i < A.length; i++) {
+            A[i] += A[i-1];
+        }
+        int[] queue = new int[A.length];
+        int l = 0, r = -1;
+        for (int i = 0; i < A.length; i++) {
+            while (l <= r && A[queue[r]] > A[i]) {
+                r--;
+            }
+            queue[++r] = i;
+            while (A[queue[r]] - A[queue[l]] >= K) {
+                result = Math.min(result, queue[r]-queue[l]);
+                l++;
+            }
+            if (A[i] >= K) {
+                result = Math.min(result, i+1);
             }
         }
-        dp[0][0] = "";
-        for (int i = 1; i < row; i++) {
-            for (int j = 0; j <= target; j++) {
-                dp[i][j] = dp[i-1][j];
-                if (j == cost[i]) {
-                    dp[i][j] = i+1+"";
-                }
-                if (j > cost[i] && "".compareTo(dp[i][j - cost[i]]) != 0) {
-                    dp[i][j] = max(dp[i-1][j], i + 1 + dp[i][j-cost[i]]);
-                }
-            }
-
-        }
-        for (int i = 0; i < dp.length; i++) {
-            System.out.println(Arrays.toString(dp[i]));
-        }
-        String res = dp[row - 1][target];
-        return "".equals(res)? "0": res;
-    }
-
-    /**
-     * 计算两个字符串，数字最大的字符串
-     */
-    private String max(String a, String b) {
-        if (a.length() > b.length()) {
-            return a;
-        } else if (a.length() < b.length()) {
-            return b;
-        }
-        return a.compareTo(b) > 0? a: b;
+        return result == Integer.MAX_VALUE? -1: result;
     }
 
     public static void main(String[] argv) {
         LeetCodeSolution lcs = new LeetCodeSolution();
+        int[]  array = new int[]{1, 3, -1, 3};
+        lcs.shortestSubarray(array, 5);
         System.out.println(1+2+"34");
     }
 }
