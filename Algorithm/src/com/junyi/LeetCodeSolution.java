@@ -1,49 +1,61 @@
 package com.junyi;
 
 import javafx.util.Pair;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Copy;
 import org.junit.platform.commons.util.StringUtils;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.lang.Math.incrementExact;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
+import static java.lang.Math.*;
 
 
 public class LeetCodeSolution {
 
-    public int shortestSubarray(int[] A, int K) {
-        int result = Integer.MAX_VALUE;
-        for (int i = 1; i < A.length; i++) {
-            A[i] += A[i-1];
-        }
-        int[] queue = new int[A.length];
-        int l = 0, r = -1;
-        for (int i = 0; i < A.length; i++) {
-            while (l <= r && A[queue[r]] > A[i]) {
-                r--;
-            }
-            queue[++r] = i;
-            while (A[queue[r]] - A[queue[l]] >= K) {
-                result = Math.min(result, queue[r]-queue[l]);
-                l++;
-            }
-            if (A[i] >= K) {
-                result = Math.min(result, i+1);
+
+    public int[] searchRange(int[] nums, int target) {
+        int[] res = new int[]{-1,-1};
+        if (nums.length == 0) return res;
+        //计算第一个位置
+        int low = 0;
+        int high = nums.length-1;
+        while (low < high) {
+            int mid = low + ((high-low) >> 1);
+            if (nums[mid] >= target) {
+                res[0] = mid;
+                high = mid-1;
+            } else if (nums[mid] < target) {
+                low = mid + 1;
             }
         }
-        return result == Integer.MAX_VALUE? -1: result;
+        //计算最后一个位置
+        low = 0;
+        high = nums.length-1;
+        while ( low < high ) {
+            int mid = low + ((high -low) >> 1) + 1;
+            if (nums[mid] <= target) {
+                res[1] = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return res;
     }
 
     public static void main(String[] argv) {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        int[]  array = new int[]{1, 3, -1, 3};
-        lcs.shortestSubarray(array, 5);
-        System.out.println(1+2+"34");
+        char[][]  array = {{'1','0','1','0'},
+                {'1','0','1','1'},
+                {'1','0','1','1'},
+                {'1','1','1','1'}};
+
+//        int result = lcs.maximalSquare(array);
+//        System.out.println(result);
     }
 }
 

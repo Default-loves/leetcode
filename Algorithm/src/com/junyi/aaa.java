@@ -7,6 +7,8 @@ import java.io.*;
 import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * User: JY
@@ -77,12 +79,7 @@ public class aaa {
     }
 
     public static void main(String[] args) {
-        for (int i = 100000; i < 1000000; i += 100000) {
-            Experiment exp = new Experiment(i);
-            exp.work();
-            double est = exp.estimate();
-            System.out.printf("%d %.2f %.2f\n", i, est, Math.abs(est - i) / i);
-        }
+        System.out.println(3 ^ 3);
     }
 }
 
