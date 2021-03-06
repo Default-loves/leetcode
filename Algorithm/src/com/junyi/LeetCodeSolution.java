@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -17,45 +18,33 @@ import static java.lang.Math.*;
 public class LeetCodeSolution {
 
 
-    public int[] searchRange(int[] nums, int target) {
-        int[] res = new int[]{-1,-1};
-        if (nums.length == 0) return res;
-        //计算第一个位置
-        int low = 0;
-        int high = nums.length-1;
-        while (low < high) {
-            int mid = low + ((high-low) >> 1);
-            if (nums[mid] >= target) {
-                res[0] = mid;
-                high = mid-1;
-            } else if (nums[mid] < target) {
-                low = mid + 1;
+    public int minSetSize(int[] arr) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int i : arr) {
+            map.put(i, map.getOrDefault(i, 0) + 1);
+        }
+        ArrayList<Integer> list = new ArrayList<>(map.values());
+        Collections.sort(list, (a, b) ->  (b - a));     // 降序排序
+
+        int result = 0;
+        int cnt = 0;
+        int halfLen = arr.length >> 1;
+        for (int i = 0; i < list.size(); i++) {
+            cnt += list.get(i);
+            result++;
+            if (cnt > halfLen) {
+                return result;
             }
         }
-        //计算最后一个位置
-        low = 0;
-        high = nums.length-1;
-        while ( low < high ) {
-            int mid = low + ((high -low) >> 1) + 1;
-            if (nums[mid] <= target) {
-                res[1] = mid;
-                low = mid + 1;
-            } else {
-                high = mid - 1;
-            }
-        }
-        return res;
+        return halfLen;
     }
 
     public static void main(String[] argv) {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        char[][]  array = {{'1','0','1','0'},
-                {'1','0','1','1'},
-                {'1','0','1','1'},
-                {'1','1','1','1'}};
+        int[] array = new int[]{1,2,3,4,5,6,1};
 
-//        int result = lcs.maximalSquare(array);
-//        System.out.println(result);
+        int result = lcs.maxScore(array, 3);
+        System.out.println(result);
     }
 }
 
