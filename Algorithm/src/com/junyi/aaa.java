@@ -79,7 +79,11 @@ public class aaa {
     }
 
     public static void main(String[] args) {
-
+        String mqttOnline = "tcp://119.23.25.246:1883";
+        String[] split = mqttOnline.split(":");
+        StringBuilder sb = new StringBuilder();
+        String localMqttHost = sb.append("tcp:").append(split[1]).append(":1884").toString();
+        System.out.println(localMqttHost);
     }
 }
 
