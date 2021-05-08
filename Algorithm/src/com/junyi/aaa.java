@@ -27,8 +27,6 @@ public class aaa {
         HashMap<String, Object> map = new HashMap<>();
         map.put("abc", "123");
         map.put("b", 1);
-        log.info("")
-
 
     }
 
