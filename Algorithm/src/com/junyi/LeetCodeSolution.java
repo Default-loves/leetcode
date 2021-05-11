@@ -1,12 +1,41 @@
 package com.junyi;
 
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class LeetCodeSolution {
 
 
+
+    public int maxWidthRamp(int[] A) {
+        ArrayList<Integer> list = new ArrayList<>();
+        // 构建以A[0]为头的，递减序列
+        for (int i = 0; i < A.length; i++) {
+            if (list.isEmpty() || A[list.get(list.size()-1)] > A[i]) {
+                list.add(i);
+            }
+        }
+        int result = 0;     // 最终结果
+        for (int i = A.length-1; i > 0; i--) {
+            int k = binarySearch(A, i, list);
+            result = Math.max(result, i-k);
+        }
+        return result;
+    }
+    /** 返回小于A[k]的最小索引 */
+    private int binarySearch(int[] A, int k, ArrayList<Integer> list) {
+        int left = 0;
+        int right = list.size()-1;
+        while (left < right) {
+            int mid = left + ((right - left) >> 1);
+            if (A[list.get(mid)] > A[k]) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return list.get(left);
+    }
 
 
 
@@ -18,6 +47,7 @@ public class LeetCodeSolution {
         }
 
         int result = 0;
+        // 从发
         for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
             Integer number = entry.getKey();
             Integer count = entry.getValue();
