@@ -5,6 +5,43 @@ import java.util.*;
 
 public class LeetCodeSolution {
 
+    /**
+     * 统计连续0的最大长度k，而连续0的位置如果在中间的话结果就是 k / 2向上取整，而如果在开头或者尾部的话那么结果就是k
+     * 因此我们分别统计不同位置的连续0最大长度
+     * @param seats
+     * @return
+     */
+    public int maxDistToClosest(int[] seats) {
+        int n = seats.length;
+
+        // 统计头部的连续0个数
+        int i = 0;
+        int countHead = 0;
+        while (i < n && seats[i++] == 0) {
+            countHead++;
+        }
+        // 统计尾部的连续0个数
+        int countTail = 0;
+        i = n-1;
+        while (i > 0 && seats[i--] == 0) {
+            countTail++;
+        }
+
+        // 统计中间的连续0个数
+        int countMid = 0;
+        int count = 0;
+        for (i = 1; i < n; i++) {
+            if (seats[i] == 1) {
+                countMid = Math.max(countMid, count);
+                count = 0;
+            } else {
+                count++;
+            }
+        }
+        // 加1的原因是java的除法是向下取整
+        return Math.max(Math.max(countHead, countTail), (countMid + 1) / 2);
+    }
+
 
 
     public int maxWidthRamp(int[] A) {
