@@ -14,6 +14,22 @@ public class Person implements Serializable {
     private int number;
     private int version;
 
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
     public String getName() {
         return name;
     }
@@ -29,7 +45,14 @@ public class Person implements Serializable {
     public void setAge(int age) {
         this.age = age;
     }
+
+    @Override
     public String toString() {
-        return "Person: " + name + age;
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", number=" + number +
+                ", version=" + version +
+                '}';
     }
 }

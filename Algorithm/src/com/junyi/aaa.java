@@ -1,5 +1,6 @@
 package com.junyi;
 
+import javafx.beans.binding.MapExpression;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 
@@ -20,15 +21,18 @@ import java.util.stream.IntStream;
  */
 public class aaa {
 
-
-
-
     public static void main(String[] args) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("abc", "123");
-        map.put("b", 1);
-
+        int a = 10;
+        int result = (a * 2 + 12) % 10;
+        System.out.println(result);
     }
+
+    private static void swap(int a, int b) {
+        int tmp = a;
+        a = b;
+        b = tmp;
+    }
+
 
 }
 
