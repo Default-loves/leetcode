@@ -22,9 +22,8 @@ import java.util.stream.IntStream;
 public class aaa {
 
     public static void main(String[] args) {
-        int a = 10;
-        int result = (a * 2 + 12) % 10;
-        System.out.println(result);
+        Date now = new Date();
+        System.out.println(now);
     }
 
     private static void swap(int a, int b) {
