@@ -42,12 +42,82 @@ public class LeetCodeSolution {
     private TreeNode firstNode;     // 第一个错误的节点
     private TreeNode secondNode;    // 第二个错误的节点
 
-    public void recoverTree(TreeNode root) {
-        dfs(root);
-        // 交换两个错误的节点
-        int tmp = firstNode.val;
-        firstNode.val = secondNode.val;
-        secondNode.val = tmp;
+
+    public int[] findRightInterval(int[][] intervals) {
+
+    }
+
+
+    public int minimumEffortPath(int[][] heights) {
+        int answer = Integer.MAX_VALUE;
+
+        return answer;
+    }
+
+    public int hIndex(int[] citations) {
+        int left = 0, right = citations.length;
+        while (left < right) {
+            int mid = (left + right + 1) >> 1;
+            if (check(citations, mid)) {
+                left = mid;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return right;
+    }
+
+    public int orderOfLargestPlusSign(int n, int[][] mines) {
+    }
+
+    private int min4(int a, int b, int c, int d) {
+        return Math.min(Math.min(a, b), Math.min(c, d));
+    }
+
+
+    public int flipgame(int[] fronts, int[] backs) {
+        int n = fronts.length;
+        HashSet<Integer> set = new HashSet<>();     // 正面和背面相同的数字
+        for (int i = 0; i < n; i++) {
+            if (fronts[i] == backs[i]) {
+                set.add(fronts[i]);
+            }
+        }
+
+        int answer = Integer.MAX_VALUE;
+        for (int front : fronts) {
+            if (!set.contains(front)) {
+                answer = Math.min(answer, front);
+            }
+        }
+        for (int back : backs) {
+            if (!set.contains(back)) {
+                answer = Math.min(answer, back);
+            }
+        }
+        return answer == Integer.MAX_VALUE? 0: answer;
+    }
+
+    private boolean check(int[] data, int mid) {
+        long count = Arrays.stream(data).filter(t -> t >= mid).count();
+        return count >= mid;
+    }
+
+    public int countPairs(int[] deliciousness) {
+        int maxValue = Arrays.stream(deliciousness).max().getAsInt();
+        int maxSum = maxValue * 2;  // 两个餐品美味程度的最大值
+        int answer = 0;     // 最终的结果
+        int MOD = 1_000_000_007;
+        // Key: 美味程度， Value：数量
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int item : deliciousness) {
+            for (int i = 1; i < maxSum; i <<= 1) {
+                int count = map.getOrDefault(i - item, 0);
+                answer = (answer + count) % MOD;
+            }
+            map.put(item, map.getOrDefault(item, 0) + 1);
+        }
+        return answer;
     }
 
 
@@ -80,185 +150,6 @@ public class LeetCodeSolution {
     }
 
 
-    public int longestConsecutive(int[] nums) {
-        HashSet<Integer> set = new HashSet<>(Arrays.stream(nums).boxed().collect(Collectors.toList()));
-        int result = 0;
-        for (int num : nums) {
-            if (!set.contains(num - 1)) {
-                int curNum = num + 1;
-                int count = 1;
-                while (set.contains(curNum)) {
-                    curNum++;
-                    count++;
-                }
-                result = Math.max(result, count);
-            }
-        }
-        return result;
-    }
-
-    public int findMaxLength(int[] nums) {
-        HashMap<Integer, Integer> map = new HashMap<>();
-        map.put(0, -1);
-        int answer = 0;
-        int cur = 0;
-        for (int i = 0; i < nums.length; i++) {
-            int tmp = nums[i] == 0 ? cur-- : cur++;
-            if (map.containsKey(cur)) {
-                answer = Math.max(answer, i - map.get(cur));
-            } else {
-                map.put(cur, i);
-            }
-        }
-        return answer;
-    }
-
-    public int numOfSubarrays(int[] arr, int k, int threshold) {
-        int target = threshold * k;
-        int answer = 0;
-        int sum = 0;
-        // 窗口大小为k
-        for (int i = 0; i < k; i++) {
-            sum += arr[i];
-        }
-        if (sum >= target) {
-            answer++;
-        }
-        for (int i = 0; i < arr.length - k; i++) {
-            sum += arr[i + k] - arr[i];
-            if (sum >= target) {
-                answer++;
-            }
-        }
-        return answer;
-    }
-
-
-    private void dfs(TreeNode root) {
-        if (root == null) {
-            return;
-        }
-        dfs(root.left);
-        if (firstNode == null && preNode.val > root.val) firstNode = preNode;
-        if (firstNode != null && preNode.val > root.val) secondNode = root;
-        preNode = root;
-        dfs(root.right);
-    }
-
-    public int totalHammingDistance(int[] nums) {
-        int n = nums.length;
-        int total = 0;
-        for (int i = 0; i < 30; i++) {
-            int cnt = 0;
-            for (int num : nums) {
-                cnt += (num >> i) & 1;
-            }
-            total += cnt * (n - cnt);
-        }
-        return total;
-    }
-
-    public int knightDialer(int n) {
-        // 索引0的数据，表示数字4和数字6可以跳转到数字0
-        int[][] path = {{4, 6}, {6, 8}, {7, 9}, {4, 8}, {0, 3, 9}, {}, {0, 1, 7}, {2, 6}, {1, 3}, {2, 4}};
-        int MOD = 1_000_000_007;
-        int[][] dp = new int[n][10];
-        Arrays.fill(dp[0], 1);
-
-        for (int i = 1; i < n; i++) {
-            for (int j = 0; j < 10; j++) {
-                for (int k : path[j]) {
-                    dp[i][j] = (dp[i][j] + dp[i - 1][k]) % MOD;
-                }
-            }
-        }
-        int result = 0;
-        for (int i = 0; i < 10; i++) {
-            result = (result + dp[n - 1][i]) % MOD;
-        }
-        return result;
-    }
-
-
-    public int videoStitching(int[][] clips, int time) {
-        int[] dp = new int[time + 1];     // dp[i] 表示对于时间点i，需要的片段最小数量
-        Arrays.fill(dp, Integer.MAX_VALUE - 1);   // 需要注意的是，不能赋默认值为最大值
-        dp[0] = 0;
-        for (int i = 1; i <= time; i++) {
-            for (int[] clip : clips) {
-                if (clip[0] < i && i <= clip[1]) {
-                    dp[i] = Math.min(dp[i], dp[clip[0]] + 1);
-                }
-            }
-        }
-        return dp[time] == Integer.MAX_VALUE - 1 ? -1 : dp[time];
-    }
-
-    public int minHeightShelves(int[][] books, int shelf_width) {
-        int n = books.length;
-        int[] dp = new int[n + 1];  // 放置第i本书，书架整体最小高度
-        Arrays.fill(dp, Integer.MAX_VALUE);
-        dp[0] = 0;    // 初始化
-        for (int i = 1; i <= n; i++) {
-            int width = 0;
-            int height = 0;
-            int j = i;
-            while (j > 0) {
-                width += books[j - 1][0];       // 当前层的宽度
-                if (width > shelf_width) {      // 如果当前层的宽度大于书架的宽度，则结束
-                    break;
-                }
-                height = Math.max(height, books[j - 1][1]);     // 当前层的最大高度
-                dp[i] = Math.min(dp[i], height + dp[j - 1]);
-                j--;
-            }
-        }
-        return dp[n];
-    }
-
-
-    private int answer;
-
-    public int countPairs(TreeNode root, int distance) {
-        dfs(root, distance);
-        return answer;
-    }
-
-    private List<Integer> dfs(TreeNode root, int distance) {
-        ArrayList<Integer> list = new ArrayList<>();
-        if (root == null) {
-            return list;
-        }
-        if (root.left == null && root.right == null) {
-            list.add(0);
-            return list;
-        }
-        List<Integer> left = dfs(root.left, distance);
-        left = left.stream().map(t -> {
-            int newValue = t + 1;
-            if (newValue < distance) {
-                list.add(newValue);
-            }
-            return newValue;
-        }).collect(Collectors.toList());
-        List<Integer> right = dfs(root.right, distance);
-        right = right.stream().map(t -> {
-            int newValue = t + 1;
-            if (newValue < distance) {
-                list.add(newValue);
-            }
-            return newValue;
-        }).collect(Collectors.toList());
-        if (!left.isEmpty() && !right.isEmpty()) {
-            for (Integer l : left) {
-                for (Integer r : right) {
-                    answer += (l + r) <= distance ? 1 : 0;
-                }
-            }
-        }
-        return list;
-    }
-
 
     public static void main(String[] argv) {
         ArrayList<Integer> list = new ArrayList<>();
@@ -284,8 +175,8 @@ public class LeetCodeSolution {
         root.left = two;
         root.right = three;
         int[][] array = {{1, 1}, {2, 3}, {2, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 2}};
-        int result = lcs.knightDialer(3131);
-        System.out.println(result);
+//        int result = lcs.knightDialer(3131);
+//        System.out.println(result);
     }
 }
 
