@@ -24,10 +24,12 @@ import java.util.stream.IntStream;
 public class aaa {
 
     public static void main(String[] args) throws ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
-        String d = "20210812T114350";
-        Date date = format.parse(d);
-        System.out.println(date);
+        String s = "2021-08-07 13:46:30";
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = format.parse(s);
+
+
+        LocalDateTime localDateTime = LocalDateTime.parse(s, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
     }
 
@@ -37,6 +39,9 @@ public class aaa {
         b = tmp;
     }
 
+    static int lowbit(int x) {
+        return x & -x;
+    }
 
 }
 

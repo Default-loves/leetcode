@@ -4,8 +4,8 @@ package com.junyi;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class LeetCodeSolution {
@@ -21,165 +21,190 @@ public class LeetCodeSolution {
     }
 
     class Node {
-        public String val;
-        public List<Node> children;
-        public boolean alive;
+        public int x;
+        public int y;
+        public int depth;
 
-        public Node() {
-        }
-
-        public Node(String _val) {
-            val = _val;
-        }
-
-        public Node(String _val, List<Node> _children) {
-            val = _val;
-            children = _children;
+        public Node(int x, int y, int d) {
+            this.x = x;
+            this.y = y;
+            this.depth = d;
         }
     }
 
-    private TreeNode preNode = new TreeNode(Integer.MIN_VALUE);     // 前一个节点
-    private TreeNode firstNode;     // 第一个错误的节点
-    private TreeNode secondNode;    // 第二个错误的节点
+    public int maxLength(List<String> arr) {
+        int n = arr.size();
 
 
-    public int[] findRightInterval(int[][] intervals) {
-
+        return 0;
     }
 
-
-    public int minimumEffortPath(int[][] heights) {
-        int answer = Integer.MAX_VALUE;
-
-        return answer;
-    }
-
-    public int hIndex(int[] citations) {
-        int left = 0, right = citations.length;
-        while (left < right) {
-            int mid = (left + right + 1) >> 1;
-            if (check(citations, mid)) {
-                left = mid;
+    public int findPeakElement(int[] nums) {
+        if (nums.length == 1) {
+            return 0;
+        }
+        int l = 0, r = nums.length-1;
+        while (l < r) {
+            int mid = l + ((r - l) >> 1);
+            if (nums[mid] < nums[mid+1]) {
+                l = mid + 1;
             } else {
-                right = mid - 1;
+                r = mid;
             }
         }
-        return right;
-    }
-
-    public int orderOfLargestPlusSign(int n, int[][] mines) {
-    }
-
-    private int min4(int a, int b, int c, int d) {
-        return Math.min(Math.min(a, b), Math.min(c, d));
+        return l;
     }
 
 
-    public int flipgame(int[] fronts, int[] backs) {
-        int n = fronts.length;
-        HashSet<Integer> set = new HashSet<>();     // 正面和背面相同的数字
+    public int largestMagicSquare(int[][] grid) {
+        int n = grid.length;
+        int m = grid[0].length;
+        int maxSize = 1;      // 最大幻方的尺寸，也即是结果
+
+        int[][] rowSum = new int[n][m+1];     // 行的前缀和
+        int[][] columnSum = new int[n+1][m];     // 列的前缀和
+        // 计算前缀和
         for (int i = 0; i < n; i++) {
-            if (fronts[i] == backs[i]) {
-                set.add(fronts[i]);
+            for (int j = 0; j < m; j++) {
+                rowSum[i][j+1] = rowSum[i][j] + grid[i][j];
+                columnSum[i+1][j] = columnSum[i][j] + grid[i][j];
             }
         }
-
-        int answer = Integer.MAX_VALUE;
-        for (int front : fronts) {
-            if (!set.contains(front)) {
-                answer = Math.min(answer, front);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                for (int k = maxSize + 1; i + k <= n && j + k <= m; k++) {    // 对于每个格子，不必每次都从尺寸1开始
+                    if (isMagic(grid, rowSum, columnSum, i, j, k)) {
+                        maxSize = k;
+                    }
+                }
             }
         }
-        for (int back : backs) {
-            if (!set.contains(back)) {
-                answer = Math.min(answer, back);
-            }
-        }
-        return answer == Integer.MAX_VALUE? 0: answer;
+        return maxSize;
     }
 
-    private boolean check(int[] data, int mid) {
-        long count = Arrays.stream(data).filter(t -> t >= mid).count();
-        return count >= mid;
+    private boolean isMagic(int[][] grid, int[][] rowSum, int[][] columnSum, int a, int b, int size) {
+        int sum = 0;        // 左斜对角和
+        int otherSum = 0;   // 右斜对角和
+        for (int i = 0; i < size; i++) {
+            sum += grid[a + i][b + i];
+            otherSum += grid[a + i][b + size - 1 - i];
+        }
+        if (sum != otherSum) {
+            return false;
+        }
+        for (int i = 0; i < size; i++) {
+            if (sum != rowSum[a + i][b + size] - rowSum[a + i][b]) {     // 判断每一行
+                return false;
+            }
+            if (sum != columnSum[a + size][b + i] - columnSum[a][b + i]) {      // 判断每一列
+                return false;
+            }
+        }
+        return true;
     }
 
-    public int countPairs(int[] deliciousness) {
-        int maxValue = Arrays.stream(deliciousness).max().getAsInt();
-        int maxSum = maxValue * 2;  // 两个餐品美味程度的最大值
-        int answer = 0;     // 最终的结果
-        int MOD = 1_000_000_007;
-        // Key: 美味程度， Value：数量
-        HashMap<Integer, Integer> map = new HashMap<>();
-        for (int item : deliciousness) {
-            for (int i = 1; i < maxSum; i <<= 1) {
-                int count = map.getOrDefault(i - item, 0);
-                answer = (answer + count) % MOD;
+    public int minimumSize(int[] nums, int maxOperations) {
+        int left = 0, right = 1_000_000_000;
+        while (left < right) {
+            int mid = left + ((right - left) >> 1);
+            if (check(nums, mid, maxOperations)) {
+                right = mid;
+            } else {
+                left = mid + 1;
             }
-            map.put(item, map.getOrDefault(item, 0) + 1);
+        }
+        return left;
+    }
+
+
+//
+    public int triangleNumber(int[] nums) {
+        int n = nums.length;
+        Arrays.sort(nums);
+        int answer = 0;
+        for (int i = n-1; i >= 2; i--) {
+            int left = 0, right = i-1;
+            while (left < right) {
+                if (nums[left] + nums[right] > nums[i]) {
+                    answer += right - left;
+                    right--;
+                } else {
+                    left++;
+                }
+            }
         }
         return answer;
     }
 
 
+    public int numSubarrayBoundedMax(int[] nums, int left, int right) {
+        return noGreater(nums, right) - noGreater(nums, left - 1);
+    }
 
-    public List<Integer> peopleIndexes(List<List<String>> favoriteCompanies) {
-        ArrayList<Integer> answerList = new ArrayList<>();
-        int n = favoriteCompanies.size();
-        Set<String>[] set = new Set[n];
-        for (int i = 0; i < n; i++) {
-            set[i] = new HashSet<>(favoriteCompanies.get(i));
+    /** 计算连续子数组中最大值不大于k的子数组数量 */
+    private int noGreater(int[] nums, int k) {
+        int pre = 0;
+        int answer = 0;
+        for (int num : nums) {
+            if (num <= k) {
+                pre++;
+            } else {
+                pre = 0;
+            }
+            answer += pre;
         }
+        return answer;
+    }
 
-        for (int i = 0; i < n; i++) {
-            int j = 0;
-            while (j < n) {
-                 if (i == j) {
-                     j++;
-                     continue;
-                 }
-                 if (set[j].containsAll(favoriteCompanies.get(i))) {
-                     break;
-                 }
-                 j++;
+    public int subarraysWithKDistinct(int[] nums, int k) {
+        return solve(nums, k) - solve(nums, k - 1);
+    }
+
+    /**
+     * 连续子数组不同整数个数不超过k个的子数组个数
+     * @param fruits
+     * @param k: 连续子数组不同整数的个数
+     * @return
+     */
+    public int solve(int[] fruits, int k) {
+        int preIndex = 0;   // 索引
+        int answer = 0;     // 结果
+        // Key: 树类型     Value：数量
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < fruits.length; i++) {
+            int v = map.getOrDefault(fruits[i], 0);
+            if (v == 0) {
+                k--;
             }
-            if (j == n) {
-                answerList.add(i);
+            map.put(fruits[i], v + 1);
+            while (k < 0) {
+                map.put(fruits[preIndex], map.get(fruits[preIndex]) - 1);
+                if (map.get(fruits[preIndex]) == 0) {
+                    k++;
+                }
+                preIndex++;
             }
+            answer += i - preIndex + 1;
         }
-        return answerList;
+        return answer;
     }
 
 
-
-    public static void main(String[] argv) {
-        ArrayList<Integer> list = new ArrayList<>();
-        list.add(1);
-        list.add(2);
-        list = (ArrayList<Integer>) list.stream().map(t -> t + 1).collect(Collectors.toList());
-
-
-        System.out.println(list.toString());
+    public int bulbSwitch(int n) {
+        if(n == 1) {
+            return 1;
+        }
 
     }
+
+
 
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        TreeNode root = new TreeNode(1);
-        TreeNode two = new TreeNode(2);
-        two.left = new TreeNode(4);
-        two.right = new TreeNode(5);
-        TreeNode three = new TreeNode(3);
-        three.left = new TreeNode(6);
-        three.right = new TreeNode(7);
-        root.left = two;
-        root.right = three;
-        int[][] array = {{1, 1}, {2, 3}, {2, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 2}};
-//        int result = lcs.knightDialer(3131);
-//        System.out.println(result);
+
+        int[] array = {1000000000};
+        int result = lcs.minimumSize(array, 1);
+        System.out.println(result);
     }
 }
-
-
-
-
