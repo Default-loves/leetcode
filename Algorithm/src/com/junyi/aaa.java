@@ -3,6 +3,7 @@ package com.junyi;
 import javafx.beans.binding.MapExpression;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.CollectionUtils;
 
 import java.io.*;
 import java.security.ProtectionDomain;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,13 +25,13 @@ import java.util.stream.IntStream;
  */
 public class aaa {
 
-    public static void main(String[] args) throws ParseException {
-        String s = "2021-08-07 13:46:30";
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = format.parse(s);
-
-
-        LocalDateTime localDateTime = LocalDateTime.parse(s, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    public static void main(String[] args) throws ParseException, IOException {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        List<String> subList = list.subList(1, 10);
+        System.out.println(subList.toString());
 
     }
 
