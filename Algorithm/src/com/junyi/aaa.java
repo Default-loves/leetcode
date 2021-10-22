@@ -26,12 +26,13 @@ import java.util.stream.IntStream;
 public class aaa {
 
     public static void main(String[] args) throws ParseException, IOException {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("1");
-        list.add("2");
-        list.add("3");
-        List<String> subList = list.subList(1, 10);
-        System.out.println(subList.toString());
+
+        List<Integer> list = Arrays.asList(1, 1, 2, 2, 10, 10, 16);
+        int res = 0;
+        for (Integer i : list) {
+            res ^= i;
+        }
+        System.out.println(res);
 
     }
 

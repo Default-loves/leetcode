@@ -1697,12 +1697,213 @@ public class LeetCodeSolution {
     }
 
 
+
+    public int singleNonDuplicate(int[] nums) {
+        int l = 0, r = nums.length - 1;
+        while (l < r) {
+            int mid = l + ((r - l) >> 1);
+            if ((mid & 1) == 1) {   // 奇数
+                if (nums[mid] == nums[mid + 1]) {
+                    r = mid - 1;
+                } else {
+                    l = mid + 1;
+                }
+            } else {    // 偶数
+                if (nums[mid] == nums[mid + 1]) {
+                    l = mid + 2;
+                } else {
+                    r = mid;
+                }
+            }
+        }
+        return nums[l];
+    }
+
+    public boolean isPossible(int[] nums) {
+        // 统计数字的个数
+        HashMap<Integer, Integer> countMap = new HashMap<>();
+        // 结尾为该数字的连续子序列数量
+        HashMap<Integer, Integer> tailMap = new HashMap<>();
+        for (int num : nums) {
+            countMap.put(num, countMap.getOrDefault(num, 0) + 1);
+        }
+
+        for (int num : nums) {
+            int value = countMap.getOrDefault(num, 0);
+            if (value == 0) {
+                continue;
+            } else if (tailMap.getOrDefault(num - 1, 0) > 0) {     // 当前数字可以拼接在已有的序列中
+                countMap.put(num, value-1);
+                tailMap.put(num-1, tailMap.get(num - 1) - 1);
+                tailMap.put(num, tailMap.getOrDefault(num, 0) + 1);
+            } else if (countMap.getOrDefault(num+1, 0) > 0 && countMap.getOrDefault(num+2, 0) > 0) {    // 当前数字可以与后面的数字形成连续序列
+                countMap.put(num, value - 1);
+                countMap.put(num + 1, countMap.get(num + 1) - 1);
+                countMap.put(num + 2, countMap.get(num + 2) - 1);
+                tailMap.put(num + 2, tailMap.getOrDefault(num + 2, 0) + 1);
+            } else {
+                return false;
+            }
+        }
+        // 全部数字遍历完毕
+        return true;
+    }
+
+    public int maxSumTwoNoOverlap(int[] nums, int firstLen, int secondLen) {
+        // 计算前缀和
+        for (int i = 1; i < nums.length; i++) {
+            nums[i] += nums[i - 1];
+        }
+        // firstLen 的连续子数组最大和
+        int maxFirstLen = nums[firstLen - 1];
+        // 结果
+        int res = nums[firstLen + secondLen - 1];
+        for (int i = firstLen + secondLen; i < nums.length; i++) {
+            maxFirstLen = Math.max(maxFirstLen, nums[i - secondLen] - nums[i - firstLen - secondLen]);
+            // 当前的 secondLen 子数组和
+            int curSecondLen = nums[i] - nums[i - secondLen];
+            res = Math.max(res, maxFirstLen + curSecondLen);
+        }
+        return res;
+    }
+
+    public double largestSumOfAverages(int[] nums, int k) {
+
+        int n = nums.length;
+        double[] preSum = new double[n+1];    // 前缀和
+        double[][] dp = new double[n+1][k+1];     // dp[i][j] 表示 nums 前 i 个数，切分为j份的平均值总和
+        // 计算前缀和
+        for (int i = 1; i < preSum.length; i++) {
+            preSum[i] = preSum[i-1] + nums[i-1];
+        }
+        // 计算结果
+        for (int i = 1; i < dp.length; i++) {   // 遍历nums
+            dp[i][1] = preSum[i] / i;   // 计算 k = 1
+            for (int j = 2; j <= k && j <= i; j++) {   // 遍历 k
+                for (int l = 1; l < i; l++) {
+                    dp[i][j] = Math.max(dp[i][j], dp[l][j-1] + (preSum[i] - preSum[l]) / (i - l));
+                }
+            }
+        }
+        return dp[n][k];
+    }
+
+    public int numSubarraysWithSum(int[] nums, int goal) {
+        int n = nums.length;
+        // 前缀和
+        int preSum = 0;
+        HashMap<Integer, Integer> map = new HashMap<>();    // 保存前缀和结果
+        map.put(0, 1);
+        // 计算结果
+        int res = 0;
+        for (int i = 0; i < n; i++) {
+            preSum += nums[i];
+            int target = preSum - goal;
+            res += map.getOrDefault(target, 0);
+            map.put(preSum, map.getOrDefault(preSum, 0) + 1);
+        }
+        return res;
+    }
+
+
+    public int[][] highestPeak(int[][] isWater) {
+        int n = isWater.length;
+        int m = isWater[0].length;
+        int[][] direction = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}};
+        boolean[][] visited = new boolean[n][m];    // 记录已经访问的格子
+        int[][] res = new int[n][m];
+        Deque<int[]> queue = new ArrayDeque<>();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (isWater[i][j] == 1) {       // 找到所有的水域格子
+                    queue.addLast(new int[]{i, j});
+                    visited[i][j] = true;
+                    res[i][j] = 0;
+                }
+            }
+        }
+        while (!queue.isEmpty()) {
+            int[] poll = queue.pollFirst();
+            int curLength = res[poll[0]][poll[1]];
+            for (int i = 0; i < 4; i++) {
+                int xn = poll[0] + direction[i][0];
+                int yn = poll[1] + direction[i][1];
+                if (xn >= 0 && xn < n && yn >= 0 && yn < m && !visited[xn][yn]) {
+                    res[xn][yn] = curLength+1;
+                    visited[xn][yn] = true;
+                    queue.addLast(new int[]{xn, yn});
+                }
+            }
+        }
+        return res;
+    }
+
+    public int[] getStrongest(int[] arr, int k) {
+        Arrays.sort(arr);
+        int mid = arr[(arr.length - 1) / 2];      // 中位数
+
+        int l = 0, r = arr.length - 1;  // 左右指针
+        int[] res = new int[k];     // 结果数组
+        int i = 0;  // 结果数组 res 的指针
+        while (i < k) {     // 获取 k 个数
+            int a = Math.abs(arr[l] - mid);
+            int b = Math.abs(arr[r] - mid);
+            if (a > b) {
+                res[i++] = arr[l++];
+            } else {
+                res[i++] = arr[r--];
+            }
+        }
+        return res;
+    }
+
+    public String replaceWords(List<String> dictionary, String sentence) {
+        // 词根处理
+        TrieNode head = new TrieNode();
+        for (String s : dictionary) {
+            TrieNode cur = head;
+            for (char c : s.toCharArray()) {
+                if (cur.child[c - 'a'] == null) {
+                    cur.child[c - 'a'] = new TrieNode();
+                }
+                cur = cur.child[c - 'a'];
+            }
+            cur.word = s;
+        }
+        // 计算结果
+        StringBuilder sb = new StringBuilder();
+        for (String s : sentence.split("\\s")) {
+            if (sb.length() > 0) {
+                sb.append(" ");     // 添加空格
+            }
+            TrieNode cur = head;
+            for (char c : s.toCharArray()) {
+                if (cur.child[c - 'a'] == null || cur.word != null) {
+                    break;
+                }
+                cur = cur.child[c - 'a'];
+            }
+            sb.append(cur.word != null? cur.word: s);
+        }
+        return sb.toString();
+    }
+
+    class TrieNode {
+        TrieNode[] child;
+        String word;
+
+        public TrieNode() {
+            this.child = new TrieNode[26];
+        }
+    }
+
+
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        String[] array = {"0:start:0","0:start:2","0:end:5","1:start:7","1:end:7","0:end:8"};
-        List<String> list = Arrays.stream(array).collect(Collectors.toList());
-        int[] r = lcs.exclusiveTime(2, list);
+        int[] array = {1,1,3,5,5};
+        int[] r = lcs.getStrongest(array, 2);
         System.out.println(Arrays.toString(r));
     }
 }
