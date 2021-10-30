@@ -4,10 +4,7 @@ package com.junyi;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static java.lang.Math.*;
 
 public class LeetCodeSolution {
 
@@ -1885,6 +1882,7 @@ public class LeetCodeSolution {
                 cur = cur.child[c - 'a'];
             }
             sb.append(cur.word != null? cur.word: s);
+
         }
         return sb.toString();
     }
@@ -1898,6 +1896,103 @@ public class LeetCodeSolution {
         }
     }
 
+    public boolean PredictTheWinner(int[] nums) {
+        int n = nums.length;
+        int[][] memo = new int[n][n];
+        return helper(nums, 0, n - 1, memo) >= 0;
+    }
+
+    private int helper(int[] nums, int i, int j, int[][] memo) {
+        if (i == j) {
+            return nums[i];
+        }
+        if (memo[i][j] != 0) {
+            return memo[i][j];
+        }
+        int a = nums[i] - helper(nums, i + 1, j, memo);
+        int b = nums[j] - helper(nums, i, j - 1, memo);
+        int max = Math.max(a, b);
+        memo[i][j] = max;
+        return max;
+        
+    }
+
+    public int largestValsFromLabels(int[] values, int[] labels, int numWanted, int useLimit) {
+        int n = values.length;
+        int[][] data = new int[n][2];
+        for (int i = 0; i < n; i++) {   // 整合 values 数组和 labels 数组
+            data[i][0] = values[i];
+            data[i][1] = labels[i];
+        }
+        Arrays.sort(data, (o1, o2) -> o2[0] - o1[0]);   // 根据 value 从大到小排序
+        int res = 0;    // 结果
+        HashMap<Integer, Integer> map = new HashMap<>();    // 记录使用的数据的 label，及其数量
+        int count = 0;      // 记录已经统计的数字数量
+        int i = 0;      // 索引
+        while (i < n && count < numWanted) {
+            Integer v = map.getOrDefault(data[i][1], 0);
+            if (v < useLimit) {
+                count++;
+                res += data[i][0];
+                map.put(data[i][1], v + 1);
+            }
+            i++;
+        }
+        return res;
+    }
+
+    public int minScoreTriangulation(int[] values) {
+        int n = values.length;
+        int[][] dp = new int[n][n];
+        for (int i = 2; i < n; i++) {
+            for (int j = i - 2; j >= 0; j--) {
+                for (int k = j + 1; k < i; k++) {
+                    int v = values[i] * values[j] + values[k] + dp[j][k] + dp[k][i];
+                    if (dp[j][i] == 0) {
+                        dp[j][i] = v;
+                    } else {
+                        dp[j][i] = Math.min(dp[j][i], v);
+                    }
+                }
+            }
+        }
+        return dp[0][n-1];
+    }
+
+    public int maxEqualRowsAfterFlips(int[][] matrix) {
+        int n = matrix.length;
+        int m = matrix[0].length;
+        HashMap<String, Integer> map = new HashMap<>();
+        int res = 0;
+        for (int i = 0; i < n; i++) {
+            boolean firstZero = matrix[i][0] == 0 ? true : false;
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < m; j++) {
+                if (firstZero) {
+                    sb.append(matrix[i][j]);
+                } else {
+                    sb.append(matrix[i][j] ^ 1);
+                }
+            }
+            String s = sb.toString();
+            Integer v = map.getOrDefault(s, 0);
+            map.put(s, v + 1);
+            res = Math.max(res, v + 1);
+        }
+        return res;
+    }
+
+    public int maxChunksToSorted(int[] arr) {
+        int max = 0;
+        int count = 0;
+        for (int i = 0; i < arr.length; i++) {
+            max = Math.max(max, arr[i]);
+            if (max == i) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     @Test
     public void test() {
