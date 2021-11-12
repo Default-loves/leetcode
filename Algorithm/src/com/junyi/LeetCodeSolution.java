@@ -1,8 +1,10 @@
 package com.junyi;
 
 
+
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -1696,11 +1698,32 @@ public class LeetCodeSolution {
         return array;
     }
 
+    public int removeCoveredIntervals(int[][] intervals) {
+        Arrays.sort(intervals, (a, b) -> {
+            if (a[0] != b[0]) {
+                return a[0] - b[0];
+            }
+            return b[1] - a[1];
+        });      // 根据起点从小到大排序，如果起点相同则更长的排在前面
+        int count = 0;    // 计算需要删除的区间个数
 
+        int[] pre = intervals[0];
+        for (int i = 1; i < intervals.length; i++) {
+            int[] interval = intervals[i];
+            if (interval[0] >= pre[0] && interval[1] <= pre[1]) {
+                count++;
+            } else {
+                pre = interval;
+            }
+        }
+        return intervals.length - count;
+    }
+
+[[3,10],[4,10],[5,11]]
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        String[] array = {"0:start:0","0:start:2","0:end:5","1:start:7","1:end:7","0:end:8"};
+        String[] array = {[[3,10],[4,10],[5,11]]};
         List<String> list = Arrays.stream(array).collect(Collectors.toList());
         int[] r = lcs.exclusiveTime(2, list);
         System.out.println(Arrays.toString(r));
