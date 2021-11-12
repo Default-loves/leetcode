@@ -4,6 +4,7 @@ package com.junyi;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class LeetCodeSolution {
@@ -1505,7 +1506,7 @@ public class LeetCodeSolution {
     private int[] array;
 
     /** 计算数字转变为二进制数后 1 的个数*/
-    private int get(Integer num) {
+    private int find(Integer num) {
         if (map.containsKey(num)) {
             return map.get(num);
         }
@@ -1559,11 +1560,11 @@ public class LeetCodeSolution {
      * @param total：剩余的可选字符串
      */
     private void dfs(Integer index, Integer cur, Integer total) {
-        if (get(cur | total) <= this.res) {      // 剪枝，当前的结果再加上剩余的小于 res，则不必往后递归了
+        if (find(cur | total) <= this.res) {      // 剪枝，当前的结果再加上剩余的小于 res，则不必往后递归了
             return;
         }
         if (index == n) {   // 遍历完全部字符串
-            this.res = Math.max(this.res, get(cur));
+            this.res = Math.max(this.res, find(cur));
             return;
         }
         int other = this.array[index];
@@ -1855,46 +1856,7 @@ public class LeetCodeSolution {
         return res;
     }
 
-    public String replaceWords(List<String> dictionary, String sentence) {
-        // 词根处理
-        TrieNode head = new TrieNode();
-        for (String s : dictionary) {
-            TrieNode cur = head;
-            for (char c : s.toCharArray()) {
-                if (cur.child[c - 'a'] == null) {
-                    cur.child[c - 'a'] = new TrieNode();
-                }
-                cur = cur.child[c - 'a'];
-            }
-            cur.word = s;
-        }
-        // 计算结果
-        StringBuilder sb = new StringBuilder();
-        for (String s : sentence.split("\\s")) {
-            if (sb.length() > 0) {
-                sb.append(" ");     // 添加空格
-            }
-            TrieNode cur = head;
-            for (char c : s.toCharArray()) {
-                if (cur.child[c - 'a'] == null || cur.word != null) {
-                    break;
-                }
-                cur = cur.child[c - 'a'];
-            }
-            sb.append(cur.word != null? cur.word: s);
 
-        }
-        return sb.toString();
-    }
-
-    class TrieNode {
-        TrieNode[] child;
-        String word;
-
-        public TrieNode() {
-            this.child = new TrieNode[26];
-        }
-    }
 
     public boolean PredictTheWinner(int[] nums) {
         int n = nums.length;
@@ -1994,11 +1956,95 @@ public class LeetCodeSolution {
         return count;
     }
 
+
+    public List<List<String>> suggestedProducts(String[] products, String searchWord) {
+        Arrays.sort(products);
+        List<List<String>> res = new ArrayList<>();
+        for (int i = 1; i <= searchWord.length(); i++) {
+            res.add(find(searchWord.substring(0, i), products));
+        }
+        return res;
+    }
+
+    private List<String> find(String s, String[] products) {
+        Integer index = getStartIndex(s, products);
+        ArrayList<String> list = new ArrayList<>();
+        while (index < products.length && list.size() < 3 && products[index].startsWith(s)) {
+            list.add(products[index++]);
+        }
+        return list;
+    }
+
+    /** 获取以字符串 s 开头的最小索引 */
+    private Integer getStartIndex(String s, String[] products) {
+        int left = 0, right = products.length - 1;
+        while (left < right) {
+            int mid = left + ((right - left) >> 1);
+            if (s.compareTo(products[mid]) > 0) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return left;
+    }
+
+
+    public int rangeSum(int[] nums, int n, int left, int right) {
+        int MOD = 1_000_000_007;
+        int[] preSum = new int[n+1];  // 前缀和
+        for (int i = 1; i < preSum.length; i++) {
+            preSum[i] = preSum[i-1] + nums[i-1];
+        }
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i = 1; i < preSum.length; i++) {
+            for (int j = 0; j < i; j++) {
+                list.add(preSum[i] - preSum[j]);
+            }
+        }
+        Collections.sort(list);
+        int res = 0;
+        for (Integer t : list.subList(left - 1, right)) {
+            res = (res + t) % MOD;
+        }
+        return res;
+    }
+
+    public int numberOfSubarrays(int[] nums, int k) {
+        int n = nums.length;
+        int count = 0;      // 计算窗口内的奇数个数
+        int left = 0, right = 0;    // 左右指针
+        int res = 0;        // 最终结果
+        while (right < n) {
+            count += nums[right++] & 1;
+            if (count == k) {
+                // 计算后续连续偶数的个数
+                int tmp = right;
+                while (right < n && (nums[right] & 1) == 0 ) {
+                    right++;
+                }
+                int rightEvenCount = right - tmp;
+                // 计算前面连续偶数的个数
+                int leftEvenCount = 0;
+                while ((nums[left] & 1) == 0) {
+                    leftEvenCount++;
+                    left++;
+                }
+
+                res += (rightEvenCount + 1) * (leftEvenCount + 1);
+                count--;
+                left++;
+            }
+        }
+        return res;
+    }
+
+
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        int[] array = {1,1,3,5,5};
-        int[] r = lcs.getStrongest(array, 2);
-        System.out.println(Arrays.toString(r));
+        int[] array = {100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100};
+        int r = lcs.rangeSum(array, 1000, 1, 500500);
+        System.out.println(r);
     }
 }
