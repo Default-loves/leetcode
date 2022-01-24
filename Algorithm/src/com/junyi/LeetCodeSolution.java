@@ -2168,6 +2168,66 @@ public class LeetCodeSolution {
 
     }
 
+    public String licenseKeyFormatting(String s, int k) {
+        StringBuilder sb = new StringBuilder();
+        int count = k;
+        for (int i = s.length() - 1; i >= 0; i--) {
+            char c = s.charAt(i);
+            if (c == '-') {
+                continue;
+            }
+            sb.append(Character.toUpperCase(c));
+            count--;
+            if (count == 0) {
+                count = k;
+                sb.append('-');
+            }
+        }
+        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '-') {    // 特殊情况处理
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.reverse().toString();
+    }
+
+    public boolean detectCapitalUse(String word) {
+        if (word.length() > 1 && Character.isLowerCase(word.charAt(0)) && Character.isUpperCase(word.charAt(1))) {
+            return false;
+        }
+
+        for (int i = 2; i < word.length(); i++) {
+            if (Character.isUpperCase(word.charAt(i)) ^ Character.isUpperCase(word.charAt(1))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int minimumRefill(int[] plants, int capacityA, int capacityB) {
+        int left = 0;       // 左指针
+        int right = plants.length - 1;      // 右指针
+        int result = 0;     // 结果
+        int remainA = capacityA, remainB = capacityB;       // A 和 B的剩余水量
+        while (left < right) {
+            if (plants[left] > remainA) {       // 左边
+                remainA = capacityA;
+                result++;
+            }
+            remainA -= plants[left];
+
+            if (plants[right] > remainB) {      // 右边
+                remainB = capacityB;
+                result++;
+            }
+            remainB -= plants[right];
+            left++;
+            right--;
+        }
+        if (left == right && plants[left] > remainA && plants[left] > remainB) {    // 特殊情况处理，两人共浇一个植物，且两人剩余水量都不足，那么A需要重新装水
+            result++;
+        }
+        return result;
+    }
+
 
     @Test
     public void test() {
