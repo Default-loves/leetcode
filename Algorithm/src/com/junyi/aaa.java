@@ -13,8 +13,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -24,25 +25,47 @@ import java.util.stream.IntStream;
  * Description:
  */
 public class aaa {
+//    private static ThreadLocal<Book> threadLocal = new ThreadLocal<>();
+    private static InheritableThreadLocal<Book> threadLocal = new InheritableThreadLocal<>();
 
-    public static void main(String[] args) throws ParseException, IOException {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("1");
-        list.add("2");
-        list.add("3");
-        List<String> subList = list.subList(1, 10);
-        System.out.println(subList.toString());
+
+    public static void main(String[] args) throws ParseException, IOException, InterruptedException {
+        threadLocal.set(new Book(1, "pencil fly"));
+
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        executorService.submit(MyJob());
+
+
+        Thread.sleep(10 * 1000);
+        System.out.println(threadLocal.get().toString());
+        threadLocal.get().setName("key line");
+        System.out.println(threadLocal.get().toString());
+
+        executorService.shutdown();
 
     }
 
-    private static void swap(int a, int b) {
-        int tmp = a;
-        a = b;
-        b = tmp;
+    private static Runnable MyJob() {
+        return () -> {
+            while (true) {
+                try {
+                    Book book = threadLocal.get();
+                    book.setId(3);
+                    System.out.println(book.toString());
+                    Thread.sleep(3 * 1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 
-    static int lowbit(int x) {
-        return x & -x;
+
+    @Test
+    public void test() throws InterruptedException {
+        System.out.println(500 * 1001);
+
+
     }
 
 }
