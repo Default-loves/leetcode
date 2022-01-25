@@ -1,7 +1,7 @@
 package com.junyi;
 
 
-
+import jdk.nashorn.internal.objects.Global;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
@@ -1717,15 +1717,6 @@ public class LeetCodeSolution {
         return intervals.length - count;
     }
 
-    @Test
-    public void test() {
-        LeetCodeSolution lcs = new LeetCodeSolution();
-        String[] array = {[[3, 10],[4, 10],[5, 11]]};
-        List<String> list = Arrays.stream(array).collect(Collectors.toList());
-        int[] r = lcs.exclusiveTime(2, list);
-        System.out.println(Arrays.toString(r));
-    }
-
     public int singleNonDuplicate(int[] nums) {
         int l = 0, r = nums.length - 1;
         while (l < r) {
@@ -1984,9 +1975,6 @@ public class LeetCodeSolution {
             }
         }
         return count;
-        int a = 0;
-        int b = k;
-
     }
 
 
@@ -2046,27 +2034,226 @@ public class LeetCodeSolution {
         return res;
     }
 
-
-    public int nthSuperUglyNumber(int n, int[] primes) {
-        PriorityQueue<Long> queue = new PriorityQueue<>();
-        HashSet<Long> set = new HashSet<>();
-        queue.add(1L);
-        set.add(1L);
-        while (n-- > 0) {
-            long poll = queue.poll();
-            if (n == 0) {
-                return (int) poll;
+    public int[] sumEvenAfterQueries(int[] nums, int[][] queries) {
+        int evenSum = 0;    // 偶数和
+        for (int num : nums) {
+            if ((num & 1) == 0) {
+                evenSum += num;
             }
-            for (int prime : primes) {
-                if (!set.contains(prime * poll)) {
-                    set.add(prime * poll);
-                    queue.add(prime * poll);
+        }
+        ArrayList<Integer> result = new ArrayList<>();      // 结果
+        for (int[] query : queries) {
+            int index = query[1];
+            int oldValue = nums[index];
+            int newValue = query[0] + oldValue;
+            if ((oldValue & 1) == 0) {      // 旧值是偶数
+                if ((newValue & 1) == 0) {       // 新值是偶数
+                    evenSum += query[0];
+                } else {    // 新值是奇数
+                    evenSum -= oldValue;
                 }
+            } else if ((newValue & 1) == 0) {   // 旧值是奇数且新值是偶数
+                evenSum += newValue;
+            }
+            nums[index] = newValue;
+            result.add(evenSum);
+        }
+        return result.stream().mapToInt(t -> t).toArray();
+    }
+
+    class BrowserHistory {
+        private String[] array;     // 数据
+        private Integer curIndex;   // 当前的位置
+        private Integer size;   // 网站数量
+
+        public BrowserHistory(String homepage) {
+            array = new String[1000];
+            array[0] = homepage;
+            curIndex = 0;
+            size = 1;
+        }
+
+        public void visit(String url) {
+            array[++curIndex] = url;
+            size = curIndex + 1;
+        }
+
+        public String back(int steps) {
+            curIndex -= steps;
+            if (curIndex < 0) {
+                curIndex = 0;
+            }
+            return array[curIndex];
+        }
+
+        public String forward(int steps) {
+            curIndex += steps;
+            if (curIndex >= size) {
+                curIndex = size - 1;
+            }
+            return array[curIndex];
+        }
+    }
+
+    public char[][] rotateTheBox(char[][] box) {
+        int n = box.length;
+        int m = box[0].length;
+        // 先生成结果数组
+        char[][] result = new char[m][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                result[j][n-i-1] = box[i][j];
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            int index = m - 1;
+            for (int j = m - 1; j > 0; j--) {
+                if (result[j][i] == '#') {
+                    result[j][i] = '.';
+                    result[index--][i] = '#';
+                } else if (result[j][i] == '*') {
+                    index = j-1;
+                }
+            }
+        }
+        return result;
+    }
+
+    public int numberOfSubarrays(int[] nums, int k) {
+        // prefixCount[i] = t 表示的意思是累积奇数数字个数为i，t为第i个奇数前的连续偶数个数+1
+        int[] prefixCount = new int[nums.length + 1];
+        prefixCount[0] = 1;
+        int count = 0;      // 累积的奇数数字个数
+        int res = 0;        // 最终的结果
+        for (int num : nums) {
+            count += num & 1;
+            prefixCount[count]++;
+            if (count >= k) {
+                res += prefixCount[count - k];
             }
         }
         return -1;
     }
-    public void process() {
 
+    public int arrayNesting(int[] nums) {
+        int n = nums.length;
+        int maxLength = 0;
+        boolean[] memo = new boolean[n];    // 记录数据是否访问过
+        for (int i = 0; i < n; i++) {
+            if (memo[i] == false) {
+                int index = i;
+                int count = 0;
+                do {
+                    memo[index] = true;
+                    count++;
+                    index = nums[index];
+                }
+                while (index != i);
+                maxLength = Math.max(maxLength, count);
+            }
+        }
+        return maxLength;
+    }
+
+    public boolean carPooling(int[][] trips, int capacity) {
+        int[] road = new int[1001];
+
+        for (int[] trip : trips) {
+            road[trip[1]] += trip[0];
+            road[trip[2]] -= trip[0];
+        }
+        // 第一个的特殊判断
+        if (road[0] > capacity) {
+            return false;
+        }
+
+        for (int i = 1; i < road.length; i++) {
+            road[i] += road[i - 1];
+            if (road[i] > capacity) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int minMoves(int[] nums) {
+        int minValue = Arrays.stream(nums).min().getAsInt();    // 最小值
+        int answer = 0;
+        for (int num : nums) {
+            answer += (num - minValue);
+        }
+        return answer;
+
+    }
+
+    public String licenseKeyFormatting(String s, int k) {
+        StringBuilder sb = new StringBuilder();
+        int count = k;
+        for (int i = s.length() - 1; i >= 0; i--) {
+            char c = s.charAt(i);
+            if (c == '-') {
+                continue;
+            }
+            sb.append(Character.toUpperCase(c));
+            count--;
+            if (count == 0) {
+                count = k;
+                sb.append('-');
+            }
+        }
+        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '-') {    // 特殊情况处理
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.reverse().toString();
+    }
+
+    public boolean detectCapitalUse(String word) {
+        if (word.length() > 1 && Character.isLowerCase(word.charAt(0)) && Character.isUpperCase(word.charAt(1))) {
+            return false;
+        }
+
+        for (int i = 2; i < word.length(); i++) {
+            if (Character.isUpperCase(word.charAt(i)) ^ Character.isUpperCase(word.charAt(1))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int minimumRefill(int[] plants, int capacityA, int capacityB) {
+        int left = 0;       // 左指针
+        int right = plants.length - 1;      // 右指针
+        int result = 0;     // 结果
+        int remainA = capacityA, remainB = capacityB;       // A 和 B的剩余水量
+        while (left < right) {
+            if (plants[left] > remainA) {       // 左边
+                remainA = capacityA;
+                result++;
+            }
+            remainA -= plants[left];
+
+            if (plants[right] > remainB) {      // 右边
+                remainB = capacityB;
+                result++;
+            }
+            remainB -= plants[right];
+            left++;
+            right--;
+        }
+        if (left == right && plants[left] > remainA && plants[left] > remainB) {    // 特殊情况处理，两人共浇一个植物，且两人剩余水量都不足，那么A需要重新装水
+            result++;
+        }
+        return result;
+    }
+
+
+    @Test
+    public void test() {
+        LeetCodeSolution lcs = new LeetCodeSolution();
+        int[] array = {5,4,0,3,1,6,2};
+        int[][] array2 = {{1,0},{-3,1},{-4,0},{2,3}};
+        int r = lcs.arrayNesting(array);
+        System.out.println(r);
     }
 }

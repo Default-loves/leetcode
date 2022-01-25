@@ -30,18 +30,11 @@ public class aaa {
 
 
     public static void main(String[] args) throws ParseException, IOException, InterruptedException {
-        threadLocal.set(new Book(1, "pencil fly"));
+        List<ChannelEnum> list = Arrays.asList(ChannelEnum.values());
+        System.out.println(list.toString());
+        list = list.stream().limit(2).collect(Collectors.toList());
+        System.out.println(list.toString());
 
-        ExecutorService executorService = Executors.newFixedThreadPool(1);
-        executorService.submit(MyJob());
-
-
-        Thread.sleep(10 * 1000);
-        System.out.println(threadLocal.get().toString());
-        threadLocal.get().setName("key line");
-        System.out.println(threadLocal.get().toString());
-
-        executorService.shutdown();
 
     }
 
