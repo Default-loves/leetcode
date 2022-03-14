@@ -2247,6 +2247,24 @@ public class LeetCodeSolution {
         return result;
     }
 
+    public int nthSuperUglyNumber(int n, int[] primes) {
+        PriorityQueue<int[]> queue = new PriorityQueue<>((a, b) -> a[0] - b[0]);
+        for (int i = 0; i < primes.length; i++) {
+            queue.add(new int[]{primes[i], i, 0});
+        }
+        int[] res = new int[n];      // 结果
+        res[0] = 1;
+        for (int i = 1; i < n;) {
+            int[] poll = queue.poll();
+            if (res[i - 1] != poll[0]) {
+                res[i++] = poll[0];
+            }
+            int idx = poll[2];
+            queue.add(new int[]{res[idx + 1] * primes[poll[1]], poll[1], idx + 1});
+        }
+        return res[n-1];
+    }
+
 
     @Test
     public void test() {
