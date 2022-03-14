@@ -2228,6 +2228,32 @@ public class LeetCodeSolution {
         return result;
     }
 
+    class MedianFinder {
+
+        private final PriorityQueue<Integer> A;
+        private final PriorityQueue<Integer> B;
+
+        /** initialize your data structure here. */
+        public MedianFinder() {
+            A = new PriorityQueue<>();      // 小顶堆，保存大数字
+            B = new PriorityQueue<>((a, b) -> (b - a));     // 大顶堆，保存小数字
+        }
+
+        public void addNum(int num) {
+            if (A.size() == B.size()) {
+                B.add(num);
+                A.add(B.poll());
+            } else {
+                A.add(num);
+                B.add(A.poll());
+            }
+        }
+
+        public double findMedian() {
+            return A.size() == B.size()? (A.peek() + B.peek()) / 2.0: A.peek();
+        }
+    }
+
 
     @Test
     public void test() {
