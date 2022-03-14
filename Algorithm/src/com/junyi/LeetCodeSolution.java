@@ -2254,7 +2254,7 @@ public class LeetCodeSolution {
         }
         int[] res = new int[n];      // 结果
         res[0] = 1;
-        for (int i = 1; i < n;) {
+        for (int i = 1; i < n; ) {
             int[] poll = queue.poll();
             if (res[i - 1] != poll[0]) {
                 res[i++] = poll[0];
@@ -2262,7 +2262,32 @@ public class LeetCodeSolution {
             int idx = poll[2];
             queue.add(new int[]{res[idx + 1] * primes[poll[1]], poll[1], idx + 1});
         }
-        return res[n-1];
+        return res[n - 1];
+    }
+    class MedianFinder {
+
+        private final PriorityQueue<Integer> A;
+        private final PriorityQueue<Integer> B;
+
+        /** initialize your data structure here. */
+        public MedianFinder() {
+            A = new PriorityQueue<>();      // 小顶堆，保存大数字
+            B = new PriorityQueue<>((a, b) -> (b - a));     // 大顶堆，保存小数字
+        }
+
+        public void addNum(int num) {
+            if (A.size() == B.size()) {
+                B.add(num);
+                A.add(B.poll());
+            } else {
+                A.add(num);
+                B.add(A.poll());
+            }
+        }
+
+        public double findMedian() {
+            return A.size() == B.size()? (A.peek() + B.peek()) / 2.0: A.peek();
+        }
     }
 
 
