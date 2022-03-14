@@ -4,6 +4,7 @@ package com.junyi;
 import jdk.nashorn.internal.objects.Global;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -1695,7 +1696,26 @@ public class LeetCodeSolution {
         return array;
     }
 
+    public int removeCoveredIntervals(int[][] intervals) {
+        Arrays.sort(intervals, (a, b) -> {
+            if (a[0] != b[0]) {
+                return a[0] - b[0];
+            }
+            return b[1] - a[1];
+        });      // 根据起点从小到大排序，如果起点相同则更长的排在前面
+        int count = 0;    // 计算需要删除的区间个数
 
+        int[] pre = intervals[0];
+        for (int i = 1; i < intervals.length; i++) {
+            int[] interval = intervals[i];
+            if (interval[0] >= pre[0] && interval[1] <= pre[1]) {
+                count++;
+            } else {
+                pre = interval;
+            }
+        }
+        return intervals.length - count;
+    }
 
     public int singleNonDuplicate(int[] nums) {
         int l = 0, r = nums.length - 1;
@@ -1976,6 +1996,8 @@ public class LeetCodeSolution {
         return list;
     }
 
+
+
     /** 获取以字符串 s 开头的最小索引 */
     private Integer getStartIndex(String s, String[] products) {
         int left = 0, right = products.length - 1;
@@ -1994,6 +2016,7 @@ public class LeetCodeSolution {
     public int rangeSum(int[] nums, int n, int left, int right) {
         int MOD = 1_000_000_007;
         int[] preSum = new int[n+1];  // 前缀和
+
         for (int i = 1; i < preSum.length; i++) {
             preSum[i] = preSum[i-1] + nums[i-1];
         }
@@ -2010,10 +2033,6 @@ public class LeetCodeSolution {
         }
         return res;
     }
-
-
-
-
 
     public int[] sumEvenAfterQueries(int[] nums, int[][] queries) {
         int evenSum = 0;    // 偶数和
@@ -2114,7 +2133,7 @@ public class LeetCodeSolution {
                 res += prefixCount[count - k];
             }
         }
-        return res;
+        return -1;
     }
 
     public int arrayNesting(int[] nums) {
