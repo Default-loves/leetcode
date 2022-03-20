@@ -1,12 +1,9 @@
 package com.junyi;
 
 
-import jdk.nashorn.internal.objects.Global;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class LeetCodeSolution {
@@ -1503,7 +1500,6 @@ public class LeetCodeSolution {
 
 
     private int res = 0;
-    private int n;
     private Map<Integer, Integer> map;      // Key: 数字  Value：二进制数1的个数
     private int[] array;
 
@@ -2290,13 +2286,333 @@ public class LeetCodeSolution {
         }
     }
 
+    public boolean verifyPostorder(int[] postorder) {
+        return verify(postorder, 0, postorder.length - 1);
+    }
+
+    // 后续遍历：【左子树】【右子树】【根】
+    private boolean verify(int[] postorder, int a, int b) {
+        if (a >= b) {
+            return true;
+        }
+        int i = a;  // 右子树的开始索引
+        while (postorder[i] < postorder[b]) {
+            i++;
+        }
+        int j = i;
+        while (postorder[j] > postorder[b]) {   // 右子树所有节点都应该大于根节点
+            j++;
+        }
+        return j == b && verify(postorder, a, i - 1) && verify(postorder, i, b);
+    }
+
+    int[] nums, tmp;
+    public int reversePairs(int[] nums) {
+        this.nums = nums;
+        tmp = new int[nums.length];
+        return mergeSort(0, nums.length);
+    }
+
+    private int mergeSort(int left, int right) {
+        if (left >= right) {
+            return 0;
+        }
+        int mid = (left + right) >> 1;
+        int result = mergeSort(left, mid) + mergeSort(mid + 1, right);
+
+        for (int k = left; k <= right; k++) {    // 复制数组
+            this.tmp[k] = this.nums[k];
+        }
+        //开始合并
+        int i = left;   // 左数组的索引
+        int j = mid + 1;      // 右数组的索引
+        for (int k = left; k <= right; k++) {
+            if (i == mid + 1) {     // 左数组全部遍历完
+                this.nums[k] = tmp[j++];
+            } else if (j == right + 1 || tmp[i] <= tmp[j]){     // 右数组遍历完 || 左数组当前数字小于右数组当前数字，说明无逆序对
+                this.nums[k] = tmp[i++];
+            } else {    // 当前左数组数字大于当前右数组数字，说明索引从 i ~ mid之间的数字都大于右数组当前数字，都是逆序对
+                this.nums[k] = tmp[j++];
+                result += mid - i + 1;
+            }
+        }
+        return result;
+    }
+
+    public int uniquePaths(int m, int n) {
+        int[] dp = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            dp[i] = 1;
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[j] = dp[j] + dp[j-1];
+            }
+        }
+        return dp[n-1];
+    }
+
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length;
+        int n = obstacleGrid[0].length;
+        int[][] dp = new int[m][n];
+        dp[0][0] = obstacleGrid[0][0] == 1? 0: 1;       // 初始化
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (obstacleGrid[i][j] == 0) {
+                    if (i > 0 && j > 0) {
+                        dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                    } else if (j > 0) {
+                        dp[i][j] = dp[i][j-1];
+                    } else if (i > 0) {
+                        dp[i][j] = dp[i-1][j];
+                    }
+                }
+            }
+        }
+        return dp[m-1][n-1];
+    }
+
+    public int minPathSum(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] dp = new int[m][n];
+        dp[0][0] = grid[0][0];
+        int[] path = new int[n * m];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i > 0 && j > 0) {
+                    dp[i][j] = Math.min(dp[i-1][j], dp[i][j-1]) + grid[i][j];
+                } else if (i > 0) {
+                    dp[i][j] = dp[i - 1][j] + grid[i][j];
+                } else if (j > 0) {
+                    dp[i][j] = dp[i][j - 1] + grid[i][j];
+                }
+            }
+        }
+        return dp[m-1][n-1];
+    }
+
+    public int minimumTotal(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        int[] dp = new int[n];
+        dp[0] = triangle.get(0).get(0);
+
+        for (int i = 1; i < n; i++) {
+            for (int j = i; j >= 0; j--) {
+                Integer value = triangle.get(i).get(j);
+                if (j == 0) {
+                    dp[j] = dp[j] + value;
+                } else if (j == i) {
+                    dp[j] = dp[j-1] + value;
+                } else {
+                    dp[j] = Math.min(dp[j-1], dp[j]) + value;
+                }
+            }
+        }
+        return Arrays.stream(dp).min().getAsInt();
+    }
+
+
+
+    public int minFallingPathSum(int[][] grid) {
+        int MAX = Integer.MAX_VALUE;
+        int n = grid.length;
+        int[][] dp = new int[n][n];
+
+        int m1 = -1;   // 最小值索引
+        int m2 = -1;   // 次小值索引
+
+        for (int i = 0; i < n; i++) {
+            dp[0][i] = grid[0][i];
+            if (grid[0][i] < (m1 == -1? MAX : dp[0][m1])) {      // 维护最小值和次小值
+                m2 = m1;
+                m1 = i;
+            } else if (grid[0][i] < (m2 == -1? MAX: dp[0][m2])) {
+                m2 = i;
+            }
+        }
+
+        for (int i = 1; i < n; i++) {
+            int m11 = -1;   // 当前行的最小值索引
+            int m22 = -1;   // 当前行的次小值索引
+            for (int j = 0; j < n; j++) {
+                if (j == m1) {
+                    dp[i][j] = dp[i-1][m2] + grid[i][j];
+                } else {
+                    dp[i][j] = dp[i-1][m1] + grid[i][j];
+                }
+
+                if (dp[i][j] < (m11 == -1? MAX : dp[i][m11])) {      // 维护最小值和次小值
+                    m22 = m11;
+                    m11 = j;
+                } else if (dp[i][j] < (m22 == -1? MAX: dp[i][m22])) {
+                    m22 = j;
+                }
+            }
+            m1 = m11;
+            m2 = m22;
+        }
+        return Arrays.stream(dp[n - 1]).min().getAsInt();
+    }
+
+
+    public int countRoutes(int[] locations, int start, int finish, int fuel) {
+        int n = locations.length;
+        int[][] dp = new int[n][fuel + 1];       // dp[i][j] 表示从位置i开始，油量为j，到达目的地的路径数量
+        for (int i = 0; i <= fuel; i++) {       // 初始化，当开始位置在终点的时候，总是有一条路径
+            dp[finish][i] = 1;
+        }
+
+        for (int cur = 1; cur <= fuel; cur++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i != j) {
+                        int cost = Math.abs(locations[i] - locations[j]);
+                        if (cost <= cur) {
+                            dp[i][cur] += dp[j][cur - cost];
+                            dp[i][cur] %= MOD;
+                        }
+                    }
+                }
+            }
+        }
+        return dp[start][fuel];
+    }
+
+    int N;
+    int MAX_MOVE;
+    public int findPaths(int m, int n, int maxMove, int startRow, int startColumn) {
+        N = n;
+        MAX_MOVE = maxMove;
+        int[][] dp = new int[m * n][maxMove + 1];       // dp[i][j] 表示在位置i，可移动最大次数为j的时候，可以将球移出边界的路径数量
+
+        for (int i = 0; i < m; i++) {   // 初始化边缘
+            for (int j = 0; j < n; j++) {
+                if (i == 0) add(dp, i, j);
+                if (i == m-1) add(dp, i, j);
+                if (j == 0) add(dp, i, j);
+                if (j == n-1) add(dp, i, j);
+            }
+        }
+
+        int[][] direction = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};     // 四个方向
+        for (int step = 1; step <= maxMove; step++) {
+            for (int k = 0; k < m * n; k++) {
+                int[] array = parseIndex(k);
+                int x = array[0], y = array[1];
+                for (int i = 0; i < direction.length; i++) {
+                    int xn = x + direction[i][0];
+                    int yn = y + direction[i][1];
+                    if (xn >= 0 && xn <m && yn >= 0 && yn < n) {
+                        dp[k][step] += dp[getIndex(xn, yn)][step-1];
+                        dp[k][step] %= MOD;
+                    }
+                }
+            }
+        }
+        return dp[getIndex(startRow, startColumn)][maxMove];
+    }
+
+    private void add(int[][] dp, int x, int y) {
+        int index = getIndex(x, y);
+        for (int i = 1; i <= MAX_MOVE; i++) {
+            dp[index][i]++;
+        }
+    }
+
+
+    int MOD = 1_000_000_007;
+    int n;
+    int MIN = Integer.MIN_VALUE;
+    public int[] pathsWithMaxScore(List<String> board) {
+        n = board.size();
+
+        char[][] charArray = new char[n][n];        // 将 List<String> 变为 char[][]
+        for (int i = 0; i < n; i++) {
+            charArray[i] = board.get(i).toCharArray();
+        }
+
+        int[] dp = new int[n * n];      // 所在位置的得分
+        int[] cnt = new int[n * n];     // 所在位置最大得分的方案数量
+
+        for (int i = n-1; i >= 0; i--) {
+            for (int j = n-1; j >= 0; j--) {
+                int index = getIndex(i, j);
+                if (i == n-1 && j == n-1) {     // 起点
+                    cnt[index] = 1;
+                    continue;
+                }
+                if (charArray[i][j] == 'X') {      // 障碍
+                    dp[index] = MIN;
+                    continue;
+                }
+
+                int value = i == 0 && j == 0 ? 0 : charArray[i][j] - '0';
+                int curPoint = MIN;   // 当前得分
+                int curCnt = 0;     // 当前最大得分的方案数
+
+                if (i + 1 < n) {    // 下边
+                    int tmpPoint = dp[getIndex(i + 1, j)] + value;
+                    int tmpCnt = cnt[getIndex(i + 1, j)];
+                    int[] res = update(curPoint, curCnt, tmpPoint, tmpCnt);
+                    curPoint = res[0];
+                    curCnt = res[1];
+                }
+                if (j + 1 < n) {    // 右边
+                    int tmpPoint = dp[getIndex(i, j + 1)] + value;
+                    int tmpCnt = cnt[getIndex(i, j + 1)];
+                    int[] res = update(curPoint, curCnt, tmpPoint, tmpCnt);
+                    curPoint = res[0];
+                    curCnt = res[1];
+                }
+                if (i + 1 < n && j + 1 < n) {    // 右下角
+                    int tmpPoint = dp[getIndex(i + 1, j + 1)] + value;
+                    int tmpCnt = cnt[getIndex(i + 1, j + 1)];
+                    int[] res = update(curPoint, curCnt, tmpPoint, tmpCnt);
+                    curPoint = res[0];
+                    curCnt = res[1];
+                }
+                dp[index] = curPoint < 0? MIN: curPoint;
+                cnt[index] = curCnt;
+            }
+        }
+        int[] result = new int[2];  // 结果构造
+        result[0] = dp[0] < MIN? 0: dp[0];
+        result[1] = cnt[0];
+        return result;
+    }
+
+    private int[] update(int curPoint, int curCnt, int tmpPoint, int tmpCnt) {
+        int[] res = {curPoint, curCnt};
+        if (tmpPoint > curPoint) {
+            res[0] = tmpPoint;
+            res[1] = tmpCnt;
+        } else if (tmpPoint == curPoint) {
+            res[1] += tmpCnt;
+        }
+        res[1] %= MOD;
+        return res;
+    }
+
+    private int getIndex(int x, int y) {
+        return x * n + y;
+    }
+
+    private int[] parseIndex(int index) {
+        return new int[]{index / N, index % N};
+    }
+
 
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
         int[] array = {5,4,0,3,1,6,2};
         int[][] array2 = {{1,0},{-3,1},{-4,0},{2,3}};
-        int r = lcs.arrayNesting(array);
+        List<String> list = Arrays.asList("E23", "2X2", "12S");
+        int[] r = lcs.pathsWithMaxScore(list);
         System.out.println(r);
     }
 }
