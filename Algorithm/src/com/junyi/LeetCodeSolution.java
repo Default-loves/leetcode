@@ -2605,6 +2605,118 @@ public class LeetCodeSolution {
         return new int[]{index / N, index % N};
     }
 
+    public int[][] imageSmoother(int[][] img) {
+        int n = img.length;
+        int m = img[0].length;
+        int[][] ans = new int[n][m];
+        int[][] direction = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 0}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                int sum = 0;
+                int count = 0;
+                for (int[] item : direction) {
+                    int in = i + item[0];
+                    int jn = j + item[1];
+                    if (in >= 0 && in < n && jn >= 0 && jn < m) {
+                        count++;
+                        sum += img[in][jn];
+                    }
+                }
+                ans[i][j] = sum / count;
+            }
+        }
+        return ans;
+    }
+
+    public boolean hasAlternatingBits(int n) {
+        int a = (n >> 1) ^ n;
+        return ((a + 1) & a) == 0;
+    }
+
+    public List<Integer> selfDividingNumbers(int left, int right) {
+
+        ArrayList<Integer> result = new ArrayList<>();
+        step:for (int i = left; i <= right; i++) {
+            int cur = i;
+            while (cur != 0) {
+                int a = cur % 10;
+                if (a == 0 || i % a != 0) {
+                    continue step;
+                }
+                cur /= 10;
+            }
+            result.add(i);
+        }
+        return result;
+    }
+
+    public class ListNode {
+        int val;
+        ListNode next;
+        ListNode() {}
+        ListNode(int val) { this.val = val; }
+        ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+    }
+
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode fast = head;       // 快指针
+        ListNode slow = head;       // 慢指针
+        while (fast.next != null && fast.next.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        ListNode mid = slow.next;
+        slow.next = null;       // 从中间切断
+
+        ListNode left = sortList(head);
+        ListNode right = sortList(mid);
+
+        return merge(left, right);
+    }
+
+
+
+    public void reorderList(ListNode head) {
+        ListNode fast = head;   // 快指针
+        ListNode slow = head;
+        while (fast.next != null && fast.next.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        ListNode mid = slow.next;
+        slow.next = null;   // 将链表切成两部分
+        ListNode right = revert(mid);// 翻转
+        head = merge(head, right);
+    }
+
+    private ListNode merge(ListNode left, ListNode right) {
+        ListNode head = left;
+        ListNode cur = new ListNode(-1);
+        while (left != null && right != null) {
+            cur.next = left;
+            left = left.next;
+            cur.next.next = right;
+            right = right.next;
+            cur = cur.next.next;
+        }
+        return head;
+    }
+
+    private ListNode revert(ListNode node) {
+        ListNode newHead = new ListNode();
+        ListNode tmp = null;
+        while (node != null) {
+            tmp = node.next;
+            node.next = newHead;
+            newHead = node;
+            node = tmp;
+        }
+        return newHead;
+    }
 
     @Test
     public void test() {
