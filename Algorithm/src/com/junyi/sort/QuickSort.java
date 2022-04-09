@@ -39,6 +39,7 @@ public class QuickSort {
         arr[left] = arr[j];
         arr[j] = pivot;
         return j;
+
     }
 
     public static void swap(int[] arr, int p, int q) {

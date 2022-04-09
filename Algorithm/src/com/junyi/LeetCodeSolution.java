@@ -2718,6 +2718,73 @@ public class LeetCodeSolution {
         return newHead;
     }
 
+    public String dayOfTheWeek(int day, int month, int year) {
+        String[] week = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        int[] monthDays = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30};
+
+        int dayCount = 0;   // 累计的天数
+        for (int i = 1971; i < year; i++) {     // 计算年份对应的天数
+            dayCount += isLeapYear(i)? 366: 365;
+        }
+
+        for (int i = 1; i < month; i++) {       // 计算月份对应的天数
+            dayCount += monthDays[i-1];
+            if (i == 2 && isLeapYear(year)) {   // 二月份且是闰年
+                dayCount++;
+            }
+        }
+        dayCount += day;
+        return week[(dayCount + 3) % 7];    // 1970最后一天是星期四
+    }
+
+    private boolean isLeapYear(int year) {
+        return year % 400 == 0 || (year % 4 == 0 && year % 100 != 0);
+    }
+
+    public ListNode reverseKGroup(ListNode head, int k) {
+        int size = 0;   // 链表的长度
+        ListNode cur = head;
+        while (cur != null) {
+            cur = cur.next;
+            size++;
+        }
+
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode pre = dummy;
+        cur = head;
+        for (int i = 0; i < size / k; i++) {
+            ListNode last = null;
+            int count = k;
+            while (count > 0) {
+                ListNode tmp = cur.next;
+                cur.next = last;
+                last = cur;
+                cur = tmp;
+                count--;
+            }
+            ListNode end = pre.next;
+            end.next = cur;
+            pre.next = last;
+            pre = end;
+        }
+        return dummy.next;
+    }
+
+    // 翻转 k 个节点
+    private ListNode reverseK(ListNode head, int k) {
+        ListNode newHead = null;
+        ListNode cur = head;
+        while (k > 0) {
+            ListNode tmp = cur.next;
+            cur.next = newHead;
+            newHead = cur;
+            cur = tmp;
+            k--;
+        }
+        return newHead;
+    }
+
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
