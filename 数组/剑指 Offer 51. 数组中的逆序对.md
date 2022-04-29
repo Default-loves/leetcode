@@ -21,6 +21,9 @@
 
 
 ### Solution
+
+这道题的解法需要使用归并排序的思想
+
 ```java
 class Solution {
     int[] nums, tmp;
