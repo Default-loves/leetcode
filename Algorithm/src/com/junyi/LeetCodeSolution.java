@@ -1504,7 +1504,7 @@ public class LeetCodeSolution {
     private int[] array;
 
     /** 计算数字转变为二进制数后 1 的个数*/
-    private int find(Integer num) {
+    private int find(String s, HashSet<String> set, Integer num) {
         if (map.containsKey(num)) {
             return map.get(num);
         }
@@ -1558,11 +1558,11 @@ public class LeetCodeSolution {
      * @param total：剩余的可选字符串
      */
     private void dfs(Integer index, Integer cur, Integer total) {
-        if (find(cur | total) <= this.res) {      // 剪枝，当前的结果再加上剩余的小于 res，则不必往后递归了
+        if (find(s, set, cur | total) <= this.res) {      // 剪枝，当前的结果再加上剩余的小于 res，则不必往后递归了
             return;
         }
         if (index == n) {   // 遍历完全部字符串
-            this.res = Math.max(this.res, find(cur));
+            this.res = Math.max(this.res, find(s, set, cur));
             return;
         }
         int other = this.array[index];
@@ -2784,6 +2784,144 @@ public class LeetCodeSolution {
         }
         return newHead;
     }
+
+    public int findTheWinner(int n, int k) {
+        int pos = 0;
+        for (int i = 1; i <= n; i++) {
+            pos = (pos + k) % i;
+        }
+        return pos + 1;
+    }
+
+    public int[] diStringMatch(String s) {
+        int n = s.length();
+        int[] res = new int[n + 1];
+        int l = 0, r = n, idx = 0;
+
+        for (int i = 0; i < n; i++) {
+            res[idx++] = s.charAt(i) == 'I'? l++: r--;
+        }
+        res[idx] = l;
+        return res;
+    }
+
+    HashSet<String> set;
+    public boolean wordBreak(String s, List<String> wordDict) {
+        HashSet<String> set = new HashSet<>(wordDict);
+        int length = s.length();
+        boolean[] dp = new boolean[length + 1];
+        dp[0] = true;
+        for (int i = 1; i <= length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (dp[j] && set.contains(s.substring(j, i))) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[length];
+    }
+
+    int N = 55;
+    static int[][][] dp = new int[N][N][2 * N * N];
+    int[][] graph;
+    public int catMouseGame(int[][] graph) {
+        int n = graph.length;
+        this.graph = graph;
+        // 初始化 dp 数组
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                Arrays.fill(dp[i][j], -1);
+            }
+        }
+        dfs(0, 1, 0);
+    }
+
+    /* 参数分别是mouse的位置，cat的位置，轮次
+       mouse win: 1, cat win: 2, draw(平局): 0    */
+    private int dfs(int mouse, int cat, int turns) {
+        int res = dp[mouse][cat][turns];
+        if (mouse == 0) {
+            res = 1;
+        } else if (mouse == cat) {
+            res = 2;
+        } else if (turns >= 2 * N * N) {
+            res = 0;
+        }
+        if (res == -1) {
+            boolean win = false, draw = false;
+            if ((turns & 1) == 0) {     // 偶数，mouse time
+                for (int item : graph[mouse]) {
+                    int tmp = dfs(item, cat, turns + 1);
+                    if (tmp == 1) {
+                        win = true;
+                        break;
+                    } else if (tmp == 0) {
+                        draw = true;
+                    }
+                }
+                if (win) {
+                    res = 1;
+                } else if (draw) {
+                    res = 0;
+                } else {
+                    res = 2;
+                }
+            } else {    // cat time
+                for (int item : graph[cat]) {
+                    int tmp = dfs(mouse, item, turns + 1);
+                    if (tmp == 2) {
+                        win = true;
+                        break;
+                    } else if (tmp == 0) {
+                        draw = true;
+                    }
+                }
+                if (win) {
+                    res = 2;
+                } else if (draw) {
+                    res = 0;
+                } else {
+                    res = 1;
+                }
+            }
+        }
+        dp[mouse][cat][turns] = res;
+        return res;
+    }
+
+    public boolean isAlienSorted(String[] words, String order) {
+        int[] orderMap = new int[26];
+        for (int i = 0; i < order.length(); i++) {
+            orderMap[order.charAt(i) - 'a'] = i;
+        }
+
+        for (int i = 1; i < words.length; i++) {
+            if (check(orderMap, words[i-1], words[i]) > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int check(int[] orderMap, String a, String b) {
+        int i = 0, j = 0;
+        while (i < a.length() && j < b.length()) {
+            int c1 = orderMap[a.charAt(i) - 'a'];
+            int c2 = orderMap[b.charAt(j) - 'a'];
+            if (c1 != c2) {
+                return c1 - c2;
+            }
+            i++; j++;
+        }
+        if (i < a.length()) {
+            return 1;
+        } else if (j < b.length()) {
+            return -1;
+        }
+        return 0;
+    }
+
 
     @Test
     public void test() {
