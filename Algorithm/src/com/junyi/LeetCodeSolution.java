@@ -1522,55 +1522,7 @@ public class LeetCodeSolution {
     private int lowbit(Integer k) {
         return k & (-k);
     }
-    public int maxLength(List<String> arr) {
-        map = new HashMap<>();
-        HashSet<Integer> set = new HashSet<>();
-        for (String s : arr) {
-            int cur = 0;
-            for (char ch :s.toCharArray()){
-                int k = ch - 'a';
-                if (((cur >> k) & 1) != 0) {
-                    cur = -1;
-                    break;
-                }
-                cur |= (1 << k);
-            }
-            if (cur != -1) {
-                set.add(cur);
-            }
-        }
 
-        this.n = set.size();
-        int total = 0;
-        int index = 0;
-        this.array = new int[this.n];
-        for (Integer t : set) {
-            total |= t;
-            this.array[index++] = t;
-        }
-        dfs(0, 0, total);
-        return res;
-    }
-
-    /**
-     * @param index: array数组的索引
-     * @param cur：当前的结果
-     * @param total：剩余的可选字符串
-     */
-    private void dfs(Integer index, Integer cur, Integer total) {
-        if (find(s, set, cur | total) <= this.res) {      // 剪枝，当前的结果再加上剩余的小于 res，则不必往后递归了
-            return;
-        }
-        if (index == n) {   // 遍历完全部字符串
-            this.res = Math.max(this.res, find(s, set, cur));
-            return;
-        }
-        int other = this.array[index];
-        if ((cur & other) == 0) {   // 字母都不相同，可以添加
-            dfs(index + 1, cur | other, total - (total & other));
-        }
-        dfs(index + 1, cur, total);
-    }
 
     public int maxAbsValExpr(int[] arr1, int[] arr2) {
         int n = arr1.length;
@@ -2793,17 +2745,6 @@ public class LeetCodeSolution {
         return pos + 1;
     }
 
-    public int[] diStringMatch(String s) {
-        int n = s.length();
-        int[] res = new int[n + 1];
-        int l = 0, r = n, idx = 0;
-
-        for (int i = 0; i < n; i++) {
-            res[idx++] = s.charAt(i) == 'I'? l++: r--;
-        }
-        res[idx] = l;
-        return res;
-    }
 
     HashSet<String> set;
     public boolean wordBreak(String s, List<String> wordDict) {
@@ -2822,73 +2763,8 @@ public class LeetCodeSolution {
         return dp[length];
     }
 
-    int N = 55;
-    static int[][][] dp = new int[N][N][2 * N * N];
     int[][] graph;
-    public int catMouseGame(int[][] graph) {
-        int n = graph.length;
-        this.graph = graph;
-        // 初始化 dp 数组
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                Arrays.fill(dp[i][j], -1);
-            }
-        }
-        dfs(0, 1, 0);
-    }
 
-    /* 参数分别是mouse的位置，cat的位置，轮次
-       mouse win: 1, cat win: 2, draw(平局): 0    */
-    private int dfs(int mouse, int cat, int turns) {
-        int res = dp[mouse][cat][turns];
-        if (mouse == 0) {
-            res = 1;
-        } else if (mouse == cat) {
-            res = 2;
-        } else if (turns >= 2 * N * N) {
-            res = 0;
-        }
-        if (res == -1) {
-            boolean win = false, draw = false;
-            if ((turns & 1) == 0) {     // 偶数，mouse time
-                for (int item : graph[mouse]) {
-                    int tmp = dfs(item, cat, turns + 1);
-                    if (tmp == 1) {
-                        win = true;
-                        break;
-                    } else if (tmp == 0) {
-                        draw = true;
-                    }
-                }
-                if (win) {
-                    res = 1;
-                } else if (draw) {
-                    res = 0;
-                } else {
-                    res = 2;
-                }
-            } else {    // cat time
-                for (int item : graph[cat]) {
-                    int tmp = dfs(mouse, item, turns + 1);
-                    if (tmp == 2) {
-                        win = true;
-                        break;
-                    } else if (tmp == 0) {
-                        draw = true;
-                    }
-                }
-                if (win) {
-                    res = 2;
-                } else if (draw) {
-                    res = 0;
-                } else {
-                    res = 1;
-                }
-            }
-        }
-        dp[mouse][cat][turns] = res;
-        return res;
-    }
 
     public boolean isAlienSorted(String[] words, String order) {
         int[] orderMap = new int[26];
@@ -2922,14 +2798,114 @@ public class LeetCodeSolution {
         return 0;
     }
 
+    public int minJumps(int[] arr) {
+        // Key-值，Value-值对应的索引
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        int length = arr.length;
+        for (int i = 0; i < length; i++) {
+            List<Integer> list = map.computeIfAbsent(arr[i], t -> new ArrayList<>());
+            list.add(i);
+        }
+
+        HashSet<Integer> visited = new HashSet<>();     // 已经遍历的索引
+        Queue<int[]> list = new LinkedList<>();
+        list.offer(new int[]{0, 0});     // 初始队列，{0, 0}表示从索引0开始，初始步数为0
+        visited.add(0);
+        while (!list.isEmpty()) {
+            int[] pop = list.poll();
+            int index = pop[0];
+            int step = pop[1];
+            if (index == length - 1) {
+                return step;
+            }
+
+            step++;
+            int value = arr[index];
+            if (map.containsKey(value)) {
+                for (Integer t : map.get(value)) {
+                    if (visited.add(t)) {
+                        list.offer(new int[]{t, step});
+                    }
+                }
+                map.remove(value);
+            }
+            if (index < length - 1 && visited.add(index + 1)) {
+                list.offer(new int[]{index + 1, step});
+            }
+            if (index > 0 && visited.add(index - 1)) {
+                list.offer(new int[]{index - 1, step});
+            }
+        }
+        return -1;
+    }
+
+    int edgeLen;
+    int[] matchsticks;
+    public boolean makesquare(int[] matchsticks) {
+        int sum = Arrays.stream(matchsticks).sum();
+        if (sum % 4 != 0) {
+            return false;
+        }
+        edgeLen = sum >> 2;  // 边长
+        this.matchsticks = matchsticks;
+        Arrays.sort(matchsticks);
+        return check(matchsticks.length-1, new int[4]);
+    }
+
+    private boolean check(int cur, int[] lines) {
+        if (cur == -1) {
+            if (lines[0] == lines[1] && lines[1] == lines[2] && lines[2] == lines[3]) {
+                return true;
+            }
+            return false;
+        }
+        for (int i = 0; i < 4; i++) {
+            if (cur == this.matchsticks.length && i > 0 || lines[i] + this.matchsticks[cur] > edgeLen || i > 0 && lines[i] == lines[i-1]) {
+                continue;
+            }
+
+            lines[i] += this.matchsticks[cur];
+            if (check(cur - 1, lines)) {
+                return true;
+            }
+            lines[i] -= this.matchsticks[cur];
+        }
+        return false;
+    }
+
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if (root == null) {
+            return null;
+        }
+        if (root.val < key) {
+            root.right = deleteNode(root.right, key);
+        } else if (root.val > key) {
+            root.left = deleteNode(root.left, key);
+        } else {    // root 为要删除的节点
+            if (root.left == null) {
+                return root.right;
+            } else if (root.right == null) {
+                return root.left;
+            }
+            // 节点包含左子树和右子树
+            TreeNode node = root.right;
+            while (node.left != null) {
+                node = node.left;
+            }
+            node.left = root.left;
+            return root.right;
+        }
+        return root;
+    }
+
 
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        int[] array = {5,4,0,3,1,6,2};
+        int[] array = {100,-23,-23,404,100,23,23,23,3,404};
         int[][] array2 = {{1,0},{-3,1},{-4,0},{2,3}};
         List<String> list = Arrays.asList("E23", "2X2", "12S");
-        int[] r = lcs.pathsWithMaxScore(list);
+        int r = lcs.minJumps(array);
         System.out.println(r);
     }
 }

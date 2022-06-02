@@ -6,6 +6,7 @@ import java.util.Random;
 /*
     快速排序
     1. 不稳定的排序，原地排序
+    2. 关于轴的选择，可以用随机法，也可以左中右三个数选择居中的数字
  */
 public class QuickSort {
     public static void quickSort(int[] arr, int left, int right){
@@ -47,6 +48,15 @@ public class QuickSort {
         arr[p] = arr[q];
         arr[q] = tmp;
     }
+
+    // 将left, center, right下标三个数中，大小居中者放到left下标处
+    private void median3(int[]arr, int l, int r) {
+        int c = l + (r - l) / 2;
+        if (arr[l] > arr[c]) swap(arr, l, c); // 左中，大者居中
+        if (arr[c] > arr[r]) swap(arr, c, r); // 中右，大者居右，此时最大者居右
+        if (arr[c] > arr[l]) swap(arr, l, c); // 左中，大者居左，此时中者居左
+    }
+
     public static void main(String[] argv){
         int[] array1 = new int[] {95,94,91,98,99,90,99,93,91,92};
         int[] array2 = new int[] {3,5};

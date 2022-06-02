@@ -9,15 +9,21 @@ import java.util.Arrays;
  */
 public class SelectSort {
     public void selectSort(int[] arr){
-        for (int i = 0; i < arr.length; i++) {
+        for (int i = 0; i < arr.length - 1; i++) {
             int minIndex = i;
-            for (int j = i; j < arr.length; j++) {
+            for (int j = i + 1; j < arr.length; j++) {
                 if (arr[j] < arr[minIndex] ) minIndex = j;
             }
-            int temp = arr[i];
-            arr[i] = arr[minIndex];
-            arr[minIndex] = temp;
+            if (minIndex != i) {    // 对于大致已经有序的数组，该判断能够减少不必要的交换操作
+                swap(arr, i, minIndex);
+            }
         }
+    }
+
+    private void swap(int[] arr, int i, int j) {
+        int tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
     }
 
     public static void main(String[] args) {
