@@ -4,6 +4,7 @@ package com.junyi;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class LeetCodeSolution {
@@ -2896,6 +2897,46 @@ public class LeetCodeSolution {
             return root.right;
         }
         return root;
+    }
+
+    public int minEatingSpeed(int[] piles, int h) {
+        int maxValue = Arrays.stream(piles).max().getAsInt();
+        int left = 1, right = maxValue;
+        while (left < right) {
+            int mid = left + ((right - left) >> 1);
+            if (calTime(piles, mid) > h) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        return left;
+    }
+
+    /** 计算在速度 speed 下，耗费的时间 */
+    private int calTime(int[] piles, int speed) {
+        int sum = 0;
+        for (int pile : piles) {
+            sum += (pile + speed - 1) / speed;
+        }
+        return sum;
+    }
+
+    public String[] uncommonFromSentences(String s1, String s2) {
+        HashMap<String, Integer> map = new HashMap<>();
+        count(s1, map);
+        count(s2, map);
+
+        return map.entrySet().stream()
+                .filter(t -> t.getValue() == 1)
+                .map(t -> t.getKey()).toArray(String[]::new);
+    }
+
+    private void count(String s, HashMap<String, Integer> map) {
+        String[] array = s.split(" ");
+        for (String item : array) {
+            map.put(item, map.getOrDefault(item, 0) + 1);
+        }
     }
 
 
