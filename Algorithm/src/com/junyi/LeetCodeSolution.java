@@ -2,6 +2,7 @@ package com.junyi;
 
 
 import org.junit.jupiter.api.Test;
+import sun.reflect.generics.tree.Tree;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,15 +20,20 @@ public class LeetCodeSolution {
         }
     }
 
-    class Node {
-        public int x;
-        public int y;
-        public int depth;
 
-        public Node(int x, int y, int d) {
-            this.x = x;
-            this.y = y;
-            this.depth = d;
+    class Node {
+        public int val;
+        public Node next;
+
+        public Node() {}
+
+        public Node(int _val) {
+            val = _val;
+        }
+
+        public Node(int _val, Node _next) {
+            val = _val;
+            next = _next;
         }
     }
 
@@ -2477,7 +2483,7 @@ public class LeetCodeSolution {
     }
 
 
-    int MOD = 1_000_000_007;
+
     int n;
     int MIN = Integer.MIN_VALUE;
     public int[] pathsWithMaxScore(List<String> board) {
@@ -2923,6 +2929,7 @@ public class LeetCodeSolution {
     }
 
     public String[] uncommonFromSentences(String s1, String s2) {
+        Arrays.asList();
         HashMap<String, Integer> map = new HashMap<>();
         count(s1, map);
         count(s2, map);
@@ -2939,14 +2946,270 @@ public class LeetCodeSolution {
         }
     }
 
+    public int heightChecker(int[] heights) {
+        int[] array = new int[101];
+        for (int height : heights) {
+            array[height]++;
+        }
+
+        int result = 0;
+        int j = 0;      // heights 的索引
+        for (int i = 0; i < array.length; i++) {
+            while (array[i] > 0) {
+                if (heights[j++] != i) {
+                    result++;
+                }
+                array[i]--;
+            }
+
+        }
+        return result;
+    }
+
+    public int numberOfMatches(int n) {
+        int result = 0;
+        while (n > 1) {
+            if ((n & 1) == 1) {     // 奇数
+                int k = (n - 1) / 2;
+                result += k;
+                n = k + 1;
+            } else {    // 偶数
+                int k = n / 2;
+                result += k;
+                n = k;
+            }
+        }
+        return result;
+    }
+
+    public void duplicateZeros(int[] arr) {
+        // 计算需要移动的最后一个数字的索引——i
+        int n = arr.length;
+        int i = 0, j = 0;
+        while (j < n) {
+            if (arr[i] == 0) ++j;
+            ++i;
+            ++j;
+        }
+        --i;    // i 回到最后一次合法的位置
+        --j;    // j 同理，但 j 仍可能等于 n（例如输入 [0]）
+        // 从后往前移动数据
+        while (i >= 0) {
+            if (j < n) arr[j] = arr[i];
+            if (arr[i] == 0) arr[--j] = arr[i];
+            --i;
+            --j;
+        }
+    }
+
+    public Node insert(Node head, int insertVal) {
+        // 特殊判断：输入为 null
+        if (head == null) {
+            head = new Node(insertVal);
+            head.next = head;
+            return head;
+        }
+        // 特殊判断，所有数据值都相同
+        Node tmp = head.next;
+        while (tmp != head) {
+            if (tmp.val != tmp.next.val) {
+                break;
+            }
+            tmp = tmp.next;
+        }
+        if (tmp == head) {
+            Node cur = new Node(insertVal, head.next);
+            head.next = cur;
+            return head;
+        }
+
+        // 寻找插入点
+        Node p = head;      // p 为插入点
+        while (true) {
+            // 插入值不是最大值也不是最小值
+            if (p.next.val >= insertVal && p.val <= insertVal) break;
+            // 插入值是最大值
+            if (insertVal > p.val && p.next.val < p.val) break;
+            // 插入值是最小值
+            if (p.val > p.next.val && insertVal < p.next.val) break;
+            p = p.next;
+        }
+        Node cur = new Node(insertVal, p.next);
+        p.next = cur;
+        return head;
+    }
+
+    public int findBottomLeftValue(TreeNode root) {
+        List<TreeNode> list = new ArrayList<>();
+        list.add(root);     // 初始化
+
+        while (!list.isEmpty()) {
+            List<TreeNode> nextList = new ArrayList<>();    // 下一层的节点
+            for (TreeNode t : list) {
+                if (t.left != null) nextList.add(t.left);
+                if (t.right != null) nextList.add(t.right);
+            }
+            if (nextList.isEmpty()) {       // 下一层没有节点，说明list为最后一层
+                break;
+            }
+            list = nextList;
+        }
+        return list.get(0).val;
+    }
+
+    public int findBottomLeftValue2(TreeNode root) {
+        Deque<TreeNode> queue = new LinkedList<>();
+        queue.push(root);
+        TreeNode cur = null;
+        while (!queue.isEmpty()) {
+            cur = queue.pollLast();
+            if (cur.right != null) {        // 先右后左
+                queue.push(cur.right);
+            }
+            if (cur.left != null) {
+                queue.push(cur.left);
+            }
+        }
+        return cur.val;
+    }
+
+    public List<Integer> largestValues(TreeNode root) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        List<Integer> resultList = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            int maxValue = Integer.MIN_VALUE;
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
+                maxValue = Math.max(maxValue, node.val);
+            }
+            resultList.add(maxValue);
+        }
+        return resultList;
+    }
+
+    int MOD = 1_000_000_007;
+    private static List<Integer> list = new ArrayList<>();      // 只放置质数数据
+    private static int[] count = new int[101];      // count[i] 表示1~i的质数个数
+    static {
+        for (int i = 2; i <= 100; i++) {
+            boolean flag = true;
+            for (int j = 2; j * j < i; j++) {
+                if (i % j == 0) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag) {
+                list.add(i);
+            }
+            count[i] = list.size();
+        }
+    }
+
+    // 1 <= n <= 100
+    public int numPrimeArrangements(int n) {
+        System.out.println(Arrays.toString(count));
+        int prime = count[n];
+        System.out.println(prime);
+        int other = n - prime;
+
+        long result = 1;
+        for (int i = prime; i > 0; i--) {       // 质数的全排列
+            result += result * i % MOD;
+        }
+        for (int i = other; i > 0; i--) {       // 非质数的全排列
+            result += result * i % MOD;
+        }
+        return (int) result;
+    }
+
+    private final Map<String, List<Integer>> dictionary = new HashMap<>();     // 字典，保存计算的结果
+    public List<Integer> diffWaysToCompute(String expression) {
+        if (dictionary.containsKey(expression)) {
+            return dictionary.get(expression);
+        }
+        List<Integer> result = new ArrayList<>();
+        int index = 0;
+        int num = 0;
+        while (index < expression.length() && !isOperation(expression.charAt(index))) {
+            num = num * 10 + expression.charAt(index) - '0';
+            index++;
+        }
+        if (index == expression.length()) {     // expression为纯数字
+            result.add(num);
+            dictionary.put(expression, result);
+            return result;
+        }
+
+        for (int i = 0; i < expression.length(); i++) {
+            if (isOperation(expression.charAt(i))) {
+                List<Integer> subList1 = diffWaysToCompute(expression.substring(i));
+                List<Integer> subList2 = diffWaysToCompute(expression.substring(i + 1));
+                for (Integer t1 : subList1) {
+                    for (Integer t2 : subList2) {
+                        result.add(calculate(t1, t2, expression.charAt(i)));
+                    }
+                }
+            }
+        }
+        dictionary.put(expression, result);
+        return result;
+    }
+
+    // 根据运算符计算
+    private Integer calculate(Integer a, Integer b, char operation) {
+        switch (operation) {
+            case '+': return a + b;
+            case '-': return a - b;
+            case '*': return a * b;
+        }
+        return -1;
+    }
+
+    // 判断当前字符是否是运算符
+    private boolean isOperation(char c) {
+        return c == '+' || c == '-' || c == '*';
+    }
+
+    public int minRefuelStops(int target, int startFuel, int[][] stations) {
+        int result = -1;        // 结果
+        int n = stations.length;    // 油站数量
+        PriorityQueue<Integer> queue = new PriorityQueue<>((a, b) -> b - a);    // 从大到小排序
+        int remain = startFuel;   // 剩余油量
+        int loc = 0;    // 位置
+        int idx = 0;    // stations 的索引
+
+        while (loc < target) {
+            if (remain == 0) {
+                if (!queue.isEmpty()) {
+                    result++;
+                    remain += queue.poll();
+                } else {
+                    return -1;
+                }
+            }
+            loc += remain;
+            remain = 0;
+            while (idx < n && loc >= stations[idx][0]) {
+                queue.add(stations[idx++][1]);
+            }
+        }
+        return result;
+    }
+
 
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        int[] array = {100,-23,-23,404,100,23,23,23,3,404};
+        int[] array = {8,4,5,0,0,0,0,7};
         int[][] array2 = {{1,0},{-3,1},{-4,0},{2,3}};
         List<String> list = Arrays.asList("E23", "2X2", "12S");
-        int r = lcs.minJumps(array);
-        System.out.println(r);
+        lcs.duplicateZeros(array);
+        System.out.println(Arrays.toString(array));
     }
 }
