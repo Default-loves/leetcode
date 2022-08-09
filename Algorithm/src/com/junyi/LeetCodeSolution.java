@@ -2,10 +2,8 @@ package com.junyi;
 
 
 import org.junit.jupiter.api.Test;
-import sun.reflect.generics.tree.Tree;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class LeetCodeSolution {
@@ -548,7 +546,7 @@ public class LeetCodeSolution {
     }
 
 
-    private int[][] direction = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}};
+
     private boolean[][] visited;       // 记录是否访问
 
     public boolean exist(char[][] board, String word) {
@@ -3202,14 +3200,740 @@ public class LeetCodeSolution {
         return result;
     }
 
+    public int countGoodRectangles(int[][] rectangles) {
+        int maxLen = Integer.MIN_VALUE;     // 最大的正方形边长
+        int count = 0;      // 矩形数量
+        for (int[] rectangle : rectangles) {
+            int edge = Math.min(rectangle[0], rectangle[1]);
+            if (edge > maxLen) {
+                maxLen = edge;
+                count = 1;
+            } else if (edge == maxLen) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private int maxGoldSum = 0;
+
+    int m;
+    public int getMaximumGold(int[][] grid) {
+        n = grid.length;
+        m = grid[0].length;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] != 0) {
+                    dfs(grid, i, j, 0);
+                }
+            }
+        }
+        return maxGoldSum;
+    }
+
+    private void dfs(int[][] grid, int row, int column, int gold) {
+        int curGold = grid[row][column];
+        gold += curGold;
+        maxGoldSum = Math.max(maxGoldSum, gold);
+
+        grid[row][column] = 0;
+        for (int[] d : direction) {
+            int nrow = row + d[0];
+            int ncolumn = column + d[1];
+            if (nrow > 0 && nrow < n && ncolumn > 0 && ncolumn < m && grid[nrow][ncolumn] != 0) {
+                dfs(grid, nrow, ncolumn, gold);
+            }
+        }
+        grid[row][column] = curGold;
+    }
+
+    public int minCostToMoveChips(int[] position) {
+        // 总个数
+        int n = position.length;
+        // 偶数个数
+        int evenCount = (int) Arrays.stream(position).filter(t -> (t & 1) == 0).count();
+        // 奇数个数
+        int oddCount = n - evenCount;
+
+        return Math.min(evenCount, oddCount);
+    }
+
+    public int[] asteroidCollision(int[] asteroids) {
+        Deque<Integer> stack = new LinkedList<>();      // 栈
+        for (int t : asteroids) {
+            boolean ok = true;
+            while (ok && !stack.isEmpty() && stack.peekLast() > 0 && t < 0) {
+                int a = stack.peekLast();
+                int b = -t;
+                if (a <= b) stack.pollLast();
+                if (a >= b) ok = false;
+            }
+            if (ok) stack.addLast(t);
+        }
+        return stack.stream().mapToInt(t -> t).toArray();
+    }
+
+    public List<String> simplifiedFractions(int n) {
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 2; i <= n; i++) {
+            for (int j = 1; j < i; j++) {
+                if (gcd(i, j) == 1) {
+                    list.add(j + "/" + i);
+                }
+            }
+        }
+        return list;
+    }
+
+    private int gcd(int a, int b) {
+        return b != 0? gcd(b, a % b): a;
+    }
+
+    class MyCalendarTwo {
+
+        private Map<Integer, Integer> map;
+
+        public MyCalendarTwo() {
+            map = new TreeMap<>();
+        }
+
+        public boolean book(int start, int end) {
+            map.put(start, map.getOrDefault(start, 0) + 1);
+            map.put(end, map.getOrDefault(end, 0) - 1);
+
+            int count = 0;
+            for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+                count += entry.getValue();
+                if (count > 2) {
+                    map.put(start, map.get(start) - 1);
+                    map.put(end, map.get(end) - 1);
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    public TreeNode pruneTree(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        root.left = pruneTree(root.left);
+        root.right = pruneTree(root.right);
+        if (root.left != null || root.right != null) return root;
+        return root.val == 0? null: root;
+    }
+
+    class CBTInserter {
+
+        private TreeNode root;
+        private Queue<TreeNode> queue;      // 保存可添加子节点的节点，即完全二叉树的最后一层或最后两层
+
+        public CBTInserter(TreeNode root) {
+            this.root = root;
+            queue = new LinkedList<>();
+            initQueue(root);
+        }
+
+        // 初始化队列
+        private void initQueue(TreeNode root) {
+            Queue<TreeNode> queueSearch = new LinkedList<>();
+            queueSearch.offer(root);
+            while (!queueSearch.isEmpty()) {
+                TreeNode poll = queueSearch.poll();
+                if (poll.left != null) queueSearch.offer(poll.left);
+                if (poll.right != null) queueSearch.offer(poll.right);
+                if (poll.right == null) {       // 包含了两种情况，一种是左右节点都是空，一种是左节点不为空，右节点是空
+                    queue.offer(poll);
+                }
+            }
+        }
+
+        public int insert(int val) {
+            TreeNode node = queue.peek();
+            TreeNode tmp = new TreeNode(val);
+            if (node.left == null) {
+                node.left = tmp;
+            } else if (node.right == null) {
+                node.right = tmp;
+                queue.poll();       // node 节点已无空余的位置
+            }
+            queue.offer(tmp);
+            return node.val;
+        }
+
+        public TreeNode get_root() {
+            return root;
+        }
+    }
+
+    public String fractionAddition(String expression) {
+        int n = expression.length();
+        int a = 0;  // 分子
+        int b = 1;  // 分母
+        int i = 0;
+        while (i < n) {
+            int c = 0;      // 分子
+            int d = 0;      // 分母
+            boolean flag = true;    // 符号，默认是 +
+            if (expression.charAt(i) == '+' || expression.charAt(i) == '-') {
+                flag = expression.charAt(i) == '+'? true: false;
+                i++;
+            }
+            // 获取分子
+            while (i < n && Character.isDigit(expression.charAt(i))) {
+                c = c * 10 + expression.charAt(i) - '0';
+                i++;
+            }
+            // 忽略'/'
+            i++;
+            // 获取分母
+            while (i < n && Character.isDigit(expression.charAt(i))) {
+                d = d * 10 + expression.charAt(i) - '0';
+                i++;
+            }
+            if (!flag) {
+                c = -c;
+            }
+            // 计算
+            a = a * d + c * b;
+            b = b * d;
+        }
+        if (a == 0) {
+            return "0/1";
+        }
+        int t = gcd(Math.abs(a), b);  // 最大公约数
+        return a / t + "/" + b / t;
+    }
+
+    public int[] arrayRankTransform(int[] arr) {
+        int[] clone = Arrays.copyOf(arr, arr.length);
+        Arrays.sort(clone);
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int count = 1;
+        for (int item : clone) {
+            if (!map.containsKey(item)) {
+                map.put(item, count++);
+            }
+        }
+
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = map.get(arr[i]);
+        }
+        return arr;
+    }
+
+    public boolean validSquare(int[] p1, int[] p2, int[] p3, int[] p4) {
+        HashSet<Integer> set = new HashSet<>();
+        // 计算4个边长+2个对角线的长度
+        set.add(calSqure(p1, p2));
+        set.add(calSqure(p1, p3));
+        set.add(calSqure(p1, p4));
+        set.add(calSqure(p2, p3));
+        set.add(calSqure(p2, p4));
+        set.add(calSqure(p3, p4));
+
+        // 边长不能为0 && 正方形4个边长度相等，2个对角线相等，即set的长度应该为2
+        if (!set.contains(0) && set.size() == 2) {
+            return true;
+        }
+        return false;
+    }
+
+    // 计算两个点的距离的平方
+    private Integer calSqure(int[] a, int[] b) {
+        return (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]);
+    }
+
+
+
+    public int largestComponentSize(int[] nums) {
+        int maxValue = Arrays.stream(nums).max().getAsInt();
+        UnionFind2 unionFind = new UnionFind2(maxValue + 1);
+
+        for (int num : nums) {
+            for (int i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i == 0) {
+                    unionFind.union(num, i);
+                    unionFind.union(num, num / i);
+                }
+            }
+        }
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int result = 0;
+        for (int num : nums) {
+            int root = unionFind.find(num);
+            map.put(root, map.getOrDefault(root, 0) + 1);
+            result = Math.max(result, map.get(root));
+        }
+        return result;
+    }
+
+
+    public class UnionFind {
+
+        private int[] data;
+        public int unionCount;     // 合并的次数
+
+        public UnionFind(int n) {
+            data = new int[n];
+            for (int i = 0; i < n; i++) {
+                data[i] = i;
+            }
+        }
+
+        public int find(int x) {
+            if (x == data[x]) return x;
+            data[x] = find(data[x]);     //  路径压缩
+            return data[x];
+        }
+
+        public void union(int a, int b) {
+            int rootA = find(a);
+            int rootB = find(b);
+            if (rootA != rootB) {
+                unionCount++;
+                data[rootB] = rootA;
+            }
+        }
+
+        public boolean isConnect(int a, int b) {
+            return find(a) == find(b);
+        }
+    }
+
+
+    private int[][] direction = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}};
+    public int numIslands(char[][] grid) {
+        n = grid.length;
+        m = grid[0].length;
+
+        int count = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                if (grid[i][j] == '1') {
+                    bfs(grid, i, j);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private void bfs(char[][] grid, int x, int y) {
+        Queue<int[]> queue = new LinkedList<>();
+        queue.add(new int[]{x, y});
+        while (!queue.isEmpty()) {
+            int[] poll = queue.poll();
+            int a = poll[0];
+            int b = poll[1];
+            for (int i = 0; i < direction.length; i++) {
+                int p = a + direction[i][0];
+                int q = b + direction[i][1];
+                if (p >= 0 && p < n && q >= 0 && q < m && grid[p][q] == '1') {
+                    queue.offer(new int[]{p, q});
+                    grid[p][q] = '0';
+                }
+            }
+        }
+    }
+
+    public boolean isBipartite(int[][] graph) {
+        int n = graph.length;
+        int m = graph[0].length;
+
+        UnionFind2 unionFind = new UnionFind2(n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < graph[i].length; j++) {
+                if (unionFind.isConnect(i, graph[i][j])) {
+                    return false;
+                }
+                unionFind.union(graph[i][0], graph[i][j]);
+            }
+        }
+        return true;
+    }
+
+    public int longestConsecutive(int[] nums) {
+        // Key: 数字      Value：该数字所在连续序列的最大值
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int num : nums) {
+            map.put(num, num);
+        }
+        int res = 0;
+        for (int num : nums) {
+            if (!map.containsKey(num - 1)) {        // 连续序列的开头才进入
+                Integer right = map.get(num);
+                while (map.containsKey(right + 1)) {
+                    right = map.get(right + 1);
+                }
+                map.put(num, right);
+                res = Math.max(res, right - num + 1);       // 更新
+            }
+        }
+        return res;
+    }
+
+    public int minimumEffortPath(int[][] heights) {
+        int n = heights.length;
+        int m = heights[0].length;
+
+        // 保存的元素为长度为3的数组，[0]和[1]为两个方格标识，[2]为两个方格的高度差
+        List<int[]> list = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                int id = i * m + j;
+                if (i > 0) {
+                    list.add(new int[]{id, id - m, Math.abs(heights[i][j] - heights[i - 1][j])});
+                }
+                if (j > 0) {
+                    list.add(new int[]{id, id - 1, Math.abs(heights[i][j] - heights[i][j - 1])});
+                }
+            }
+        }
+        Collections.sort(list, Comparator.comparingInt(a -> a[2]));     // 根据高度差排序，从小到大
+        UnionFind2 unionFind = new UnionFind2(n * m);
+        int target = n * m - 1;     // 终点标识
+        for (int[] item : list) {
+            unionFind.union(item[0], item[1]);
+            if (unionFind.isConnect(0, target)) {       // 起点和终点是否连通
+                return item[2];
+            }
+        }
+        return 0;
+    }
+
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+        int n = equations.size();
+        HashMap<String, Integer> map = new HashMap<>(2 * n);
+        UnionFind1 unionFind = new UnionFind1(2 * n);
+        // 将变量编码为数字，映射关系保存在 map 中
+        int id = 0;
+        for (int i = 0; i < n; i++) {
+            String var1 = equations.get(i).get(0);
+            String var2 = equations.get(i).get(1);
+
+            if (!map.containsKey(var1)) {
+                map.put(var1, id++);
+            }
+            if (!map.containsKey(var2)) {
+                map.put(var2, id++);
+            }
+            unionFind.union(map.get(var1), map.get(var2), values[i]);
+        }
+
+        n = queries.size();
+        double[] result = new double[n];
+        for (int i = 0; i < n; i++) {
+            Integer val1 = map.get(queries.get(i).get(0));
+            Integer val2 = map.get(queries.get(i).get(1));
+            if (val1 == null || val2 == null) {     // 不在 map 的变量，无答案
+                result[i] = -1.0d;
+            } else {
+                result[i] = unionFind.cal(val1, val2);
+            }
+        }
+        return result;
+    }
+
+    public class UnionFind1 {
+
+        private int[] data;
+        private double[] weight;   // 权重
+
+
+        public UnionFind1(int n) {
+            data = new int[n];
+            weight = new double[n];
+            for (int i = 0; i < n; i++) {
+                data[i] = i;
+                weight[i] = 1.0d;
+            }
+        }
+
+        public int find(int x) {
+            if (x == data[x]) return x;
+            int origin = data[x];
+            data[x] = find(data[x]);     //  路径压缩
+            weight[x] *= weight[origin];
+            return data[x];
+        }
+
+        public void union(int a, int b, double value) {
+            int rootA = find(a);
+            int rootB = find(b);
+            if (rootA != rootB) {
+                data[rootA] = rootB;
+                weight[rootA] = value * weight[b] / weight[a];
+            }
+        }
+
+        public double cal(int a, int b) {
+            int rootA = find(a);
+            int rootB = find(b);
+            if (rootA != rootB) {
+                return -1.0d;
+            }
+            return weight[a] / weight[b];
+        }
+    }
+
+    class MyCircularQueue {
+
+        int[] data;
+        int head;   // 头指针
+        int tail;   // 尾指针
+        int n;      // 队列大小
+
+        public MyCircularQueue(int k) {
+            n = k + 1;
+            data = new int[k + 1];      // 注意初始化的大小
+            head = 0;
+            tail = 0;
+        }
+
+        public boolean enQueue(int value) {
+            if (this.isFull()) {
+                return false;
+            }
+            data[tail] = value;
+            tail = (tail + 1) % n;
+            return true;
+        }
+
+        public boolean deQueue() {
+            if (this.isEmpty()) {
+                return false;
+            }
+            int value = data[head];
+            head = (head + 1) % n;
+            return true;
+        }
+
+        public int Front() {
+            if (this.isEmpty()) {
+                return -1;
+            }
+            return data[head];
+        }
+
+        public int Rear() {
+            if (this.isEmpty()) {
+                return -1;
+            }
+            return data[(tail - 1 + n) % n];
+        }
+
+        public boolean isEmpty() {
+            return head == tail;
+        }
+
+        public boolean isFull() {
+            return (tail + 1) % n == head;
+        }
+    }
+
+    public int numSimilarGroups(String[] strs) {
+        int n = strs.length;
+        UnionFind2 unionFind = new UnionFind2(n);
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (similar(strs[i], strs[j])) {
+                    unionFind.union(i, j);
+                }
+            }
+        }
+        return unionFind.region;
+    }
+
+    // 判断两个字符串是否“相似”
+    private boolean similar(String a, String b) {
+        int count = 0;
+        for (int i = 0; i < a.length(); i++) {      // a和b长度相同
+            if (a.charAt(i) != b.charAt(i)) {
+                count++;
+            }
+        }
+        return count == 0 || count == 2;
+    }
+
+    public class UnionFind2 {
+
+        private int[] data;
+        public int region;     // 组的数量
+
+        public UnionFind2(int n) {
+            data = new int[n];
+            region = n;     // 初始化每个元素自成一组
+            for (int i = 0; i < n; i++) {
+                data[i] = i;
+            }
+        }
+
+        public int find(int x) {
+            if (x == data[x]) return x;
+            data[x] = find(data[x]);     //  路径压缩
+            return data[x];
+        }
+
+        public void union(int a, int b) {
+            int rootA = find(a);
+            int rootB = find(b);
+            if (rootA != rootB) {
+                data[rootB] = rootA;
+                region--;
+            }
+        }
+
+        public boolean isConnect(int a, int b) {
+            return find(a) == find(b);
+        }
+    }
+
+    public List<Integer> minSubsequence(int[] nums) {
+        Arrays.sort(nums);      // 排序
+        int total = 0;      // 计算全部数据总和
+        for (int num : nums) {
+            total += num;
+        }
+        List<Integer> list = new ArrayList<>();     // 结果
+        int index = nums.length-1;      // 索引
+        int sum = 0;
+        while (sum <= total) {
+            total -= nums[index];
+            sum += nums[index];
+            list.add(nums[index]);
+            index--;
+        }
+        return list;
+    }
+
+    // 11011000
+    public String makeLargestSpecial(String s) {
+        if (s.length() <= 2) {
+            return s;
+        }
+        int left = 0;
+        int count = 0;
+        ArrayList<String> subList = new ArrayList<>();
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '1') {
+                count++;
+            } else {
+                count--;
+                if (count == 0) {
+                    subList.add("1" + makeLargestSpecial(s.substring(left + 1, i)) + "0");
+                    left = i + 1;
+                }
+            }
+        }
+        Collections.sort(subList, Comparator.reverseOrder());
+        StringBuilder sb = new StringBuilder();
+        for (String str : subList) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+
+    public int arithmeticTriplets(int[] nums, int diff) {
+        HashSet<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
+        int res = 0;
+        for (int num : nums) {
+            if (set.contains(num - diff) && set.contains(num + diff)) {
+                res++;
+            }
+        }
+        return res;
+    }
+
+    public int reachableNodes(int n, int[][] edges, int[] restricted) {
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        for (int[] edge : edges) {
+            List<Integer> list = map.computeIfAbsent(edge[0], a -> new ArrayList<>());
+            list.add(edge[1]);
+            list = map.computeIfAbsent(edge[1], a -> new ArrayList<>());
+            list.add(edge[0]);
+        }
+
+        HashSet<Integer> set = new HashSet<>();
+        for (int item : restricted) {
+            set.add(item);
+        }
+
+        int count = 0;
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(0);
+        set.add(0);
+        while (!queue.isEmpty()) {
+            Integer cur = queue.poll();
+            count++;
+            List<Integer> subList = map.get(cur);
+            if (subList.isEmpty()) {
+                break;
+            }
+
+            for (Integer item : subList) {
+                if (set.contains(item)) {
+                    continue;
+                }
+                queue.offer(item);
+                set.add(item);
+            }
+        }
+        return count;
+    }
+
+    public boolean validPartition(int[] nums) {
+        int n = nums.length;
+        boolean[] dp = new boolean[n + 1];
+        dp[0] = true;
+        for (int i = 1; i < n; i++) {
+            if (dp[i - 1] && nums[i-1] == nums[i] || i > 1 && dp[i-2]
+                    && (nums[i] == nums[i-1] && nums[i] == nums[i-2] || nums[i] == nums[i-1] + 1 && nums[i] == nums[i-2] + 2)) {
+                dp[i + 1] = true;
+            }
+        }
+        return dp[n];
+    }
+
+    public int longestIdealString(String s, int k) {
+        int[] word = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            int ch = s.charAt(i) - 'a';
+            for (int j = Math.max(0, ch - k); j <= Math.min(25, ch + k); j++) {
+                word[ch] = Math.max(word[ch], word[j]);
+            }
+            word[ch]++;
+        }
+        return Arrays.stream(word).max().getAsInt();
+    }
+
+    public int minStartValue(int[] nums) {
+        int n = nums.length;
+        int[] sum = new int[n + 1];     // 前缀和
+        for (int i = 1; i < sum.length; i++) {
+            sum[i] = sum[i - 1] + nums[i - 1];
+        }
+        int minValue = Arrays.stream(sum).min().getAsInt();
+        if (minValue >= 1) {
+            return 1;
+        }
+        return 1 - minValue;
+    }
 
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
-        int[] array = {8,4,5,0,0,0,0,7};
-        int[][] array2 = {{1,0},{-3,1},{-4,0},{2,3}};
+        int[] array = {1,-2,-3};
+        int[][] array2 = {{0,1},{1,2},{3,1},{4,0},{0,5},{5,6}};
         List<String> list = Arrays.asList("E23", "2X2", "12S");
-        lcs.duplicateZeros(array);
-        System.out.println(Arrays.toString(array));
+        int r = lcs.minStartValue(array);
+        System.out.println(r);
+
     }
 }

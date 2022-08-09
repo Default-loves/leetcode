@@ -119,7 +119,14 @@ skiplist的查找、删除、增加数据的时间复杂度和红黑树一样都
 
 注意边界条件：当链表为空，当链表只有一个节点，当链表只有两个节点，头尾节点处理等
 
+### 并查集
+
+并查集(不相交集)是一种描述不相交集合的数据结构，即若一个问题涉及多个元素，它们可划归到不同集合，同属一个集合内的元素等价（即可用任意一个元素作为代表，比如上述的互为亲戚即互相等价），不同集合内的元素不等价。
+
+
+
 ### 数组
+
 数组支持随机访问，根据下标随机访问数据的时间复杂度为O(1)
 
 针对数组类型，很多高级语言都提供了容器类，如Java的ArrayList，容器类将很多数组操作的细节封装了起来，并且提供了动态扩容
@@ -153,8 +160,9 @@ O(n^{\log_ba})& if d < \log_ba
 - 和动态规划不同的点在于，其不能回退，动态规划保存了历史状态的数据，在当前状态下能根据历史数据，转移到另一个分支状态;
 - 在最优子结构的问题中很有效
 
-### Some tips
 
+
+### Some tips
 
 ![image](https://github.com/Default-loves/picFromInternet/blob/master/Algorithm.jpg?raw=true)
 ![image](https://github.com/Default-loves/picFromInternet/blob/master/AlgorithmBook.jpg?raw=true)
