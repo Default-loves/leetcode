@@ -3926,13 +3926,65 @@ public class LeetCodeSolution {
         return 1 - minValue;
     }
 
+    public String solveEquation(String equation) {
+        int nextStart = equation.indexOf('=');
+        int[] r1 = getFeature1(equation.substring(0, nextStart));
+        int[] r2 = getFeature1(equation.substring(nextStart + 1));
+        if (r1[0] - r2[0] == 0) {
+            if ((r2[1] - r1[1]) == 0) {
+                return "Infinite solutions";
+            } else {
+                return "No solution";
+            }
+        }
+        // 对于表达式：ax + b = cx + d      x的解：x = (b-d)/(a-c)
+        int result = (r2[1] - r1[1]) / (r1[0] - r2[0]);
+        return "x=" + result;
+    }
+
+    // 将表达式计算为 ax + b 的格式，返回结果数组长度为2，[0]=a， [1]=b
+    private int[] getFeature1(String s) {
+        int a = 0;
+        int b = 0;
+        int index = 0;
+        boolean opt = true;     // 符号
+        while (index < s.length()) {
+            if (s.charAt(index) == '+') {
+                opt = true;
+                index++;
+            } else if (s.charAt(index) == '-') {
+                opt = false;
+                index++;
+            }
+            int tmp = 0;
+            if (Character.isDigit(s.charAt(index))) {
+                while (index < s.length() && Character.isDigit(s.charAt(index))) {
+                    tmp = tmp * 10 + s.charAt(index) - '0';
+                    index++;
+                }
+            } else {
+                tmp = 1;
+            }
+            if (!opt) {
+                tmp = -tmp;
+            }
+            if (index < s.length() && s.charAt(index) == 'x') {
+                a += tmp;
+                index++;
+            } else {
+                b += tmp;
+            }
+        }
+        return new int[]{a, b};
+    }
+
     @Test
     public void test() {
         LeetCodeSolution lcs = new LeetCodeSolution();
         int[] array = {1,-2,-3};
         int[][] array2 = {{0,1},{1,2},{3,1},{4,0},{0,5},{5,6}};
         List<String> list = Arrays.asList("E23", "2X2", "12S");
-        int r = lcs.minStartValue(array);
+        String r = lcs.solveEquation("3x=33+22+11");
         System.out.println(r);
 
     }
